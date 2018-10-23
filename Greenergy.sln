@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.syncdata.energine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.chatbot-fulfillment", "greenergy.chatbot-fulfillment\greenergy.chatbot-fulfillment.csproj", "{2A9EC0F5-CE09-4CA9-BD62-F5996B9BA3E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.datalayer", "greenergy.datalayer\greenergy.datalayer.csproj", "{71DF6AD0-BC21-4DE8-8F09-EE5A8DF3AB9A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.test", "greenergy.test\greenergy.test.csproj", "{0F9FE2A0-CF9F-4CDC-AE8F-3C335A787A19}"
 EndProject
 Global

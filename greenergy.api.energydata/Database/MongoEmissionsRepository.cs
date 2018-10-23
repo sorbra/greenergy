@@ -65,21 +65,6 @@ namespace Greenergy.Database
             }
         }
 
-        public async Task<List<EmissionData>> GetEmissionData()
-        {
-            try
-            {
-                return await _context.EmissionsCollection
-                    .Find(_ => true)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
         public async Task UpdateEmissionData(List<EmissionData> emissions)
         {
             foreach (var ed in emissions)
@@ -93,7 +78,7 @@ namespace Greenergy.Database
                 options.IsUpsert = true;
                 try
                 {
-                    await _context.EmissionsCollection.UpdateOneAsync(filter,update,options);
+                    await _context.EmissionsCollection.UpdateOneAsync(filter, update, options);
                 }
                 catch (Exception ex)
                 {
@@ -113,12 +98,43 @@ namespace Greenergy.Database
                             .Limit(1)
                             .Sort(new BsonDocument("TimeStampUTC", -1))
                             .FirstAsync();
-                
+
                 return lastRecord.TimeStampUTC;
             }
             catch (Exception ex)
             {
                 // log or manage the exception
+                throw ex;
+            }
+        }
+
+        public async Task<List<EmissionData>> GetLatest()
+        {
+            DateTime latestTime = await MostRecentEmissionDataTimeStamp();
+            try
+            {
+                return await _context.EmissionsCollection
+                            .Find(ed => ed.TimeStampUTC.CompareTo(latestTime) == 0)
+                            .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // log or manage the exception
+                throw ex;
+            }
+        }
+
+        public async Task<List<EmissionData>> GetEmissionData()
+        {
+            try
+            {
+                return await _context.EmissionsCollection
+                    .Find(_ => true)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+
                 throw ex;
             }
         }

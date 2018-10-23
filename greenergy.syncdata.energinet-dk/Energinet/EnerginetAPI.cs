@@ -8,7 +8,7 @@ using Greenergy.Models;
 
 namespace Greenergy.Energinet
 {
-    public class EnerginetFacade
+    public class EnerginetAPI
     {
         public static async Task<List<EmissionData>> GetRecentEmissions(DateTime noEarlierThan)
         {
@@ -36,8 +36,12 @@ namespace Greenergy.Energinet
                         var results = new List<EmissionData>();
                         foreach (var record in emissionsJsonResponse.records)
                         {
-                            var mongoRecord = new EmissionData(Int32.Parse(record[3]), DateTime.Parse(record[0]), record[2]);
-                            results.Add(mongoRecord);
+                            results.Add(
+                                new EmissionData(
+                                    Emission: Int32.Parse(record[3]),
+                                    TimeStampUTC: DateTime.Parse(record[0]),
+                                    Region: record[2]
+                            ));
                         }
                         return results;
                     }

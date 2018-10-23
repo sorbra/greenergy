@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\greenergy.datalayer\greenergy.datalayer.csproj" />
     <ProjectReference Include="..\greenergy.syncdata.energinet-dk\greenergy.syncdata.energinet-dk.csproj" />
   </ItemGroup>
 

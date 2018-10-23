@@ -11,8 +11,8 @@ using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Greenergy.Models;
 using Greenergy.Settings;
-using Greenergy.Database;
 using Greenergy.Services;
+using Greenergy.Clients;
 
 namespace Greenergy
 {
@@ -45,20 +45,10 @@ namespace Greenergy
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddLogging();
-                    services.Configure<Application>(hostContext.Configuration.GetSection("application"));
+                    services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
 
-                    // Add framework services.
-                    services.Configure<MongoSettings>(ms =>
-                    {
-                        ms.ConnectionString
-                            = hostContext.Configuration.GetSection("MongoSettings:ConnectionString").Value;
-                        ms.Database
-                            = hostContext.Configuration.GetSection("MongoSettings:Database").Value;
-                    });
-                    services.AddTransient<IEmissionsRepository, MongoEmissionsRepository>();
-
+                    services.AddTransient<IEnergyDataClient, EnergyDataClient>();
                     services.AddHostedService<GreenergyService>();
-
                 })
                 .ConfigureLogging((hostContext, loggingBuilder) =>
                 {

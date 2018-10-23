@@ -7,29 +7,30 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using Greenergy.Models;
 using Greenergy.Settings;
-using Greenergy.Database;
 using Greenergy.Energinet;
+using Greenergy.Clients;
 
 namespace Greenergy.Services
 {
     public class GreenergyService : IHostedService, IDisposable
     {
-        private readonly IOptions<Application> _config;
+        private readonly IOptions<ApplicationSettings> _config;
         private readonly ILogger _logger;
         private readonly IApplicationLifetime _applicationLifetime;
+        private readonly IEnergyDataClient _energyDataClient;
         private Timer _timer;
-        private readonly IEmissionsRepository _emissionsRepository;
-        
+
         public GreenergyService(
-            IOptions<Application> config,
+            IOptions<ApplicationSettings> config,
             IApplicationLifetime applicationLifetime,
             ILogger<GreenergyService> logger,
-            IEmissionsRepository emissionsRepository)
+            IEnergyDataClient energyDataClient //,
+            )
         {
             _config = config;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
-            _emissionsRepository = emissionsRepository;
+            _energyDataClient = energyDataClient;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -41,24 +42,25 @@ namespace Greenergy.Services
             var name = _config.Value.Name;
             _logger.LogInformation("Service started: " + name);
 
-            _timer = new Timer(SyncData, null, TimeSpan.Zero, TimeSpan.FromSeconds(60*60));
+            _timer = new Timer(SyncData, null, TimeSpan.Zero, TimeSpan.FromSeconds(60 * 60));
 
             return Task.CompletedTask;
         }
 
         private void SyncData(object state)
         {
-            var noEarlierThan = _emissionsRepository.MostRecentEmissionDataTimeStamp().Result;
-            var emissions = EnerginetFacade.GetRecentEmissions(noEarlierThan).Result;
-            _emissionsRepository.UpdateEmissionData(emissions);
+            var noEarlierThan = _energyDataClient.GetLatestTimeStamp().Result;
+            var emissions = EnerginetAPI.GetRecentEmissions(noEarlierThan).Result;
 
             _logger.LogInformation(DateTime.Now + ": Received " + emissions.Count + " records from energinet since " + noEarlierThan.ToString());
+
+            _energyDataClient.UpdateEmissionData(emissions).Wait();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Stopping");
-            _timer.Change(Timeout.Infinite,0);
+            _timer.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
 
