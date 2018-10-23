@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Greenergy.Models;
+using Greenergy.Settings;
 using Greenergy.Database;
 using Greenergy.Services;
 
@@ -23,12 +24,6 @@ namespace Greenergy
 
         public static async Task Main(string[] args)
         {
-            // IConfiguration config = new ConfigurationBuilder()
-            //     .AddJsonFile("appsettings.json", true, true)
-            //     .AddEnvironmentVariables()
-            //     .AddCommandLine(args)
-            //     .Build();
-
             var host = new HostBuilder()
                 .ConfigureHostConfiguration(configHost =>
                 {

@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/greenergy.syncdata.energinet-dk.csproj"
+                "${workspaceFolder}/greenergy.test.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

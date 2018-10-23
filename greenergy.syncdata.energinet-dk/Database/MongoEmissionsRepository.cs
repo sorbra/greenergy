@@ -41,7 +41,7 @@ namespace Greenergy.Database
             try
             {
                 return await _context.EmissionsCollection
-                        .Find(x => x.TimeStampUTC.CompareTo(noEarlierThan) > 0)
+                        .Find(x => x.TimeStampUTC.CompareTo(noEarlierThan) >= 0)
                         .ToListAsync();
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ namespace Greenergy.Database
             }
         }
 
-        public async Task InsertOrUpdateEmissionData(List<EmissionData> emissions)
+        public async Task UpdateEmissionData(List<EmissionData> emissions)
         {
             foreach (var ed in emissions)
             {
@@ -100,7 +100,6 @@ namespace Greenergy.Database
                     // log or manage the exception
                     throw ex;
                 }
-
             }
 
         }

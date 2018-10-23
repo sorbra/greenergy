@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Greenergy.Models
+namespace Greenergy.Settings
 {
     [JsonObject("application")]    
     public class Application

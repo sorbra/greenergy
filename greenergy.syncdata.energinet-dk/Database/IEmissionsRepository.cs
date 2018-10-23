@@ -14,7 +14,7 @@ namespace Greenergy.Database
         Task InsertEmissionData(List<EmissionData> emissions);
 
         // Insert emission data. Existing emission data that match on TimeStampUTC and Region will get updated.
-        Task InsertOrUpdateEmissionData(List<EmissionData> emissions);
+        Task UpdateEmissionData(List<EmissionData> emissions);
 
         Task<List<EmissionData>> GetEmissionData ();
 

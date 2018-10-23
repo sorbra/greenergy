@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using Greenergy.Models;
+using Greenergy.Settings;
 using Greenergy.Database;
 using Greenergy.Energinet;
 
@@ -40,34 +41,18 @@ namespace Greenergy.Services
             var name = _config.Value.Name;
             _logger.LogInformation("Service started: " + name);
 
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(60*60));
+            _timer = new Timer(SyncData, null, TimeSpan.Zero, TimeSpan.FromSeconds(60*60));
 
             return Task.CompletedTask;
         }
 
-        private void DoWork(object state)
+        private void SyncData(object state)
         {
-
             var noEarlierThan = _emissionsRepository.MostRecentEmissionDataTimeStamp().Result;
-
-            _logger.LogInformation(DateTime.Now + ": Requesting recent emissions data from energinet.dk.");
-
             var emissions = EnerginetFacade.GetRecentEmissions(noEarlierThan).Result;
+            _emissionsRepository.UpdateEmissionData(emissions);
 
-            _logger.LogInformation(DateTime.Now + ": Received " + emissions.Count + " records from energinet since " + noEarlierThan.ToShortTimeString());
-
-            _emissionsRepository.InsertOrUpdateEmissionData(emissions);
-
-            var all = _emissionsRepository.GetEmissionData().Result;
-
-            all.Sort(
-                (l,r) => r.TimeStampUTC.CompareTo(l.TimeStampUTC));
-
-            System.Console.WriteLine($"Got {all.Count} records from Mongo DB:");
-            foreach (EmissionData data in all)
-            {
-                System.Console.WriteLine($"{data.TimeStampUTC}, {data.Region}: {data.Emission}");
-            }
+            _logger.LogInformation(DateTime.Now + ": Received " + emissions.Count + " records from energinet since " + noEarlierThan.ToString());
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
