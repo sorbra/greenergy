@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: greenergy-deployment
+  labels:
+    app: greenergy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greenergy
+  template:
+    metadata:
+      labels:
+        app: greenergy
+    spec:
+      containers:
+      - name:  greenergy
+        image: sorbra/greenergy.data.energinet:dev
+        imagePullPolicy: Always
+        volumeMounts: 
+        - name: "greenergy-appsettings"
+          mountPath: "/app/greenergy/appsettings.json"
+          subPath: "appsettings.json"
+      volumes:
+      - name: "greenergy-appsettings"
+        configMap: 
+          name: "greenergy-appsettings-kubemongo"

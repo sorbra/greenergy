@@ -1,0 +1,14 @@
+{
+  "application": {
+    "name": "Greenergy Service"
+  },
+  "MongoConnection": {
+    "ConnectionString": "mongodb://root:!dev123@green-mongo-dev-mongodb.default.svc.cluster.local:27017",
+    "Database": "GreenergyDB"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  }
+}
