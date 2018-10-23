@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/0bea7d34-9dcf-4d3b-b114-b4bd0559b057/resourceGroups/greenergy/providers/Microsoft.Web/sites/greenergy",
+    "appService.deploySubpath": ""
+}

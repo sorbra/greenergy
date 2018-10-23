@@ -1,0 +1,36 @@
+{
+    "responseId": "813a41b3-eb7b-44ae-888f-c7161e0c73d2",
+    "queryResult": {
+      "queryText": "appointment at 2pm tomorrow",
+      "parameters": {
+        "date": "2018-10-16T12:00:00+02:00",
+        "time": "2018-10-16T14:00:00+02:00"
+      },
+      "allRequiredParamsPresent": true,
+      "fulfillmentText": "Got it. I have your appointment scheduled on 2018-10-16 at 14:00:00. See you soon. Good-bye.",
+      "fulfillmentMessages": [
+        {
+          "text": {
+            "text": [
+              "Got it. I have your appointment scheduled on 2018-10-16 at 14:00:00. See you soon. Good-bye."
+            ]
+          }
+        }
+      ],
+      "intent": {
+        "name": "projects/dfagenttutorial/agent/intents/b4ed18cc-9df0-4cfc-8d4a-03562ad4c792",
+        "displayName": "Make Appointment"
+      },
+      "intentDetectionConfidence": 0.86,
+      "diagnosticInfo": {
+        "webhook_latency_ms": 155
+      },
+      "languageCode": "en"
+    },
+    "webhookStatus": {
+      "code": 3,
+      "message": "Webhook call failed. Error: 400 Bad Request"
+    }
+  }
+
+  
