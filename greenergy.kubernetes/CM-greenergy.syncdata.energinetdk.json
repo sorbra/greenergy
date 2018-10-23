@@ -2,6 +2,7 @@
     "Application": {
         "Name": "Greenergy Service Development",
         "UserAgent": "Greenergy Data Synchronizer",
+        "UpdateDelayInMinutes": 5,
         "EnergyDataAPI": {
             "Protocol": "http",
             "Host": "localhost",

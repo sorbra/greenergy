@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\greenergy.syncdata.energinet-dk\greenergy.syncdata.energinet-dk.csproj" />
+    <ProjectReference Include="..\greenergy.syncdata.energinetdk\greenergy.syncdata.energinetdk.csproj" />
   </ItemGroup>
 
 </Project>

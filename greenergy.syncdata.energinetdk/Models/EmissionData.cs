@@ -15,7 +15,6 @@ using Newtonsoft.Json;
 
 namespace Greenergy.Models
 {
-    [DataContract]
     public class EmissionData
     {
         public EmissionData (int Emission, DateTime TimeStampUTC, string Region)
@@ -25,13 +24,10 @@ namespace Greenergy.Models
             this.Region = Region;
         }
 
-        [DataMember(Name = "emission")]
         public int Emission { get; set; }
 
-        [DataMember(Name = "timeStampUTC")]
         public DateTime TimeStampUTC { get; set; }
         
-        [DataMember(Name = "region")]
         public string Region { get; set; }      
     }
 }

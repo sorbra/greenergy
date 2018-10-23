@@ -19,10 +19,10 @@ spec:
         image: sorbra/greenergy.data.energinet:dev
         imagePullPolicy: Always
         volumeMounts: 
-        - name: "greenergy-appsettings"
+        - name: "appsettings"
           mountPath: "/app/greenergy/appsettings.json"
           subPath: "appsettings.json"
       volumes:
-      - name: "greenergy-appsettings"
+      - name: "appsettings"
         configMap: 
-          name: "greenergy-appsettings-kubemongo"
+          name: "greenergy.syncdata.energinetdk-kubemongo"

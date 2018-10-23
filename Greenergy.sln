@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.syncdata.energinet-dk", "greenergy.syncdata.energinet-dk\greenergy.syncdata.energinet-dk.csproj", "{077D64AC-8357-4857-BC4E-8ABDD2CE9B6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.syncdata.energinetdk", "greenergy.syncdata.energinetdk\greenergy.syncdata.energinetdk.csproj", "{077D64AC-8357-4857-BC4E-8ABDD2CE9B6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "greenergy.chatbot-fulfillment", "greenergy.chatbot-fulfillment\greenergy.chatbot-fulfillment.csproj", "{2A9EC0F5-CE09-4CA9-BD62-F5996B9BA3E1}"
 EndProject

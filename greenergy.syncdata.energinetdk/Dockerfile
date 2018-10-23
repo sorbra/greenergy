@@ -11,6 +11,6 @@ COPY . ./
 RUN dotnet publish -c Release -o out
 
 FROM microsoft/dotnet:2.1-aspnetcore-runtime AS runtime
-WORKDIR /app/greenergy.syncdata.energinet-dk
+WORKDIR /app/greenergy
 COPY --from=build /app/greenergy/out ./
-ENTRYPOINT ["dotnet", "greenergy.syncdata.energinet-dk.dll"]
+ENTRYPOINT ["dotnet", "greenergy.syncdata.energinetdk.dll"]

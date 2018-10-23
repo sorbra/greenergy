@@ -42,7 +42,9 @@ namespace Greenergy.Services
             var name = _config.Value.Name;
             _logger.LogInformation("Service started: " + name);
 
-            _timer = new Timer(SyncData, null, TimeSpan.Zero, TimeSpan.FromSeconds(60 * 60));
+            _timer = new Timer(SyncData, null, TimeSpan.Zero, TimeSpan.FromSeconds(_config.Value.UpdateDelayInMinutes * 60));
+
+            _logger.LogInformation($"Data will be updated from energinet.dk every {_config.Value.UpdateDelayInMinutes} minutes");
 
             return Task.CompletedTask;
         }
