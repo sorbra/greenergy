@@ -35,12 +35,16 @@ namespace greenergy.api.server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            _logger.LogInformation("ConfigureServices start");
+
             services.Configure<MongoSettings>(ms =>
             {
                 ms.ConnectionString
                     = _config.GetSection("MongoSettings:ConnectionString").Value;
                 ms.Database
                     = _config.GetSection("MongoSettings:Database").Value;
+
+                _logger.LogInformation(ms.Database);
             });
 
             services.AddTransient<IEmissionsRepository, MongoEmissionsRepository>();
@@ -63,6 +67,8 @@ namespace greenergy.api.server
                         }
                     });
                 });
+
+            _logger.LogInformation("ConfigureServices end");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: api-service
+spec:
+  selector:
+    app: greenergy-api
+  ports:
+  - protocol: TCP
+    name: http
+    port: 80
+    targetPort: 443
+  type: NodePort
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: greenergy-deployment
+  labels:
+    app: greenergy-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greenergy-api
+  template:
+    metadata:
+      labels:
+        app: greenergy-api
+    spec:
+      containers:
+      - name:  greenergy-api
+        image: sorbra/greenergy.api.server:0.0.1
+        imagePullPolicy: Always
+        volumeMounts: 
+        - name: "appsettings"
+          mountPath: "/app/greenergy.api.server/appsettings.json"
+          subPath: "appsettings.json"
+      volumes:
+      - name: "appsettings"
+        configMap: 
+          name: "greenergy.api.server.appsettings"
