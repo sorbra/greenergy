@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using greenergy.chatbot_fulfillment.RequestModels;
 using greenergy.chatbot_fulfillment.ResponseModels;
+using Greenergy.API;
 
 namespace greenergy.chatbot_fulfillment.Controllers
 {
@@ -17,6 +18,19 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
         private const string _handleChargeCarIntent = "projects/greenergy-3dbfe/agent/intents/5845fca2-2532-4aca-ab69-d89947557032";
         private const string _handleCurrentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
+        private IGreenergyAPIClient _greenergyAPIClient;
+
+        public FulfillmentController(IGreenergyAPIClient greenergyAPIClient)
+        {
+            _greenergyAPIClient = greenergyAPIClient;
+        }
+
+        [HttpGet]
+        public ActionResult<List<EmissionDataDTO>> Getemissions()
+        {
+            var emissions = _greenergyAPIClient.GetLatest().Result;
+            return emissions;
+        }
 
         // POST api/values
         [HttpPost]
@@ -33,16 +47,19 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
             else
             {
-                return NotFound();            
+                return NotFound();
             }
         }
 
         private ActionResult<DialogFlowResponseDTO> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
         {
+            var emissions = _greenergyAPIClient.GetLatest().Result;
 
-            
+            var currentEmission = emissions[0].Emission;
+
             DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-            response.fulfillmentText = "I honestly have no idea. But, in a few days I should know more. Please come back later!!";
+            response.fulfillmentText = $"{currentEmission}";
+
             return response;
         }
 

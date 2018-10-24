@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace greenergy.api.energydata
+namespace greenergy.api.server
 {
     public class Program
     {

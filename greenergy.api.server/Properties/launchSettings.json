@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "greenergy.api.energydata": {
+    "greenergy.api.server": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",

@@ -9,10 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
-using Greenergy.Models;
 using Greenergy.Settings;
 using Greenergy.Services;
-using Greenergy.Clients;
+using Greenergy.API;
 
 namespace Greenergy
 {
@@ -47,8 +46,9 @@ namespace Greenergy
                     services.AddLogging();
                     var ctx = hostContext.Configuration.GetSection("application");
                     services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
+                    services.Configure<GreenergyAPISettings>(hostContext.Configuration.GetSection("greenergyapi"));
 
-                    services.AddTransient<IEnergyDataClient, EnergyDataClient>();
+                    services.AddTransient<IGreenergyAPIClient, GreenergyAPIClient>();
                     services.AddHostedService<GreenergyService>();
                 })
                 .ConfigureLogging((hostContext, loggingBuilder) =>

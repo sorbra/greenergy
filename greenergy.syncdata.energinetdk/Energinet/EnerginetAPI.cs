@@ -4,13 +4,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
-using Greenergy.Models;
+using Greenergy.API;
 
 namespace Greenergy.Energinet
 {
     public class EnerginetAPI
     {
-        public static async Task<List<EmissionData>> GetRecentEmissions(DateTime noEarlierThan)
+        public static async Task<List<EmissionDataDTO>> GetRecentEmissions(DateTime noEarlierThan)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -33,11 +33,11 @@ namespace Greenergy.Energinet
                     {
                         var emissionsJsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<EnerginetEmissionsResponseDTO>(await emissionsResponse.Content.ReadAsStringAsync());
 
-                        var results = new List<EmissionData>();
+                        var results = new List<EmissionDataDTO>();
                         foreach (var record in emissionsJsonResponse.records)
                         {
                             results.Add(
-                                new EmissionData(
+                                new EmissionDataDTO(
                                     Emission: Int32.Parse(record[3]),
                                     TimeStampUTC: DateTime.Parse(record[0]),
                                     Region: record[2]

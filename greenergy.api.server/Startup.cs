@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Greenergy.Settings;
 
-namespace greenergy.api.energydata
+namespace greenergy.api.server
 {
     public class Startup
     {

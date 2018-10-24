@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace greenergy.api.energydata.Controllers
+namespace greenergy.api.server.Controllers
 {
     
     [Route("api/[controller]")]

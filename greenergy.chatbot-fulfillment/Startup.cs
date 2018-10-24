@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using greenergy.chatbot_fulfillment.OutputFormatters;
+using Greenergy.API;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -18,24 +19,32 @@ namespace greenergy.chatbot_fulfillment
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public IConfiguration _config { get; set; }
 
-        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration config)
+        {
+            // var builder = new ConfigurationBuilder()
+            //     .SetBasePath(env.ContentRootPath)
+            //     .AddJsonFile("appsettings.json", optional: true)
+            //     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            // _config = builder.Build();
+            _config = config;
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(config => {
+            services.Configure<GreenergyAPISettings>(_config.GetSection("GreenergyAPI"));
+
+            services.AddMvc(config =>
+            {
                 // Force UTF-8 characterset and remove null elements in Json response . Needed to fix DialogFlow interoperability issue.
                 config.OutputFormatters.Insert(0, new DialogFlowJsonOutputFormatter(new JsonSerializerSettings(), ArrayPool<char>.Shared));
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-//            .AddJsonOptions(options => {
-//                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-//            });
+
+            services.AddSingleton<IGreenergyAPIClient, GreenergyAPIClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +57,7 @@ namespace greenergy.chatbot_fulfillment
             else
             {
                 app.UseHsts();
-                app.UseHttpsRedirection();
+                //                app.UseHttpsRedirection();
             }
 
             app.UseMvc();

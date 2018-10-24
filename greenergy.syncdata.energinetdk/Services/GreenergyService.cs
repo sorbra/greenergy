@@ -5,10 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using Greenergy.Models;
 using Greenergy.Settings;
 using Greenergy.Energinet;
-using Greenergy.Clients;
+using Greenergy.API;
 
 namespace Greenergy.Services
 {
@@ -17,14 +16,14 @@ namespace Greenergy.Services
         private readonly IOptions<ApplicationSettings> _config;
         private readonly ILogger _logger;
         private readonly IApplicationLifetime _applicationLifetime;
-        private readonly IEnergyDataClient _energyDataClient;
+        private readonly IGreenergyAPIClient _energyDataClient;
         private Timer _timer;
 
         public GreenergyService(
             IOptions<ApplicationSettings> config,
             IApplicationLifetime applicationLifetime,
             ILogger<GreenergyService> logger,
-            IEnergyDataClient energyDataClient //,
+            IGreenergyAPIClient energyDataClient
             )
         {
             _config = config;
@@ -52,6 +51,12 @@ namespace Greenergy.Services
         private void SyncData(object state)
         {
             var noEarlierThan = _energyDataClient.GetLatestTimeStamp().Result;
+
+            if (noEarlierThan.CompareTo(DateTime.MinValue) == 0)
+            {
+                noEarlierThan = _config.Value.BootstrapDate;
+            }
+
             var emissions = EnerginetAPI.GetRecentEmissions(noEarlierThan).Result;
 
             _logger.LogInformation(DateTime.Now + ": Received " + emissions.Count + " records from energinet since " + noEarlierThan.ToString());
