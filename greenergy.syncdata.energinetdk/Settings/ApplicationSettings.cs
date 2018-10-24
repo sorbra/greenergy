@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Greenergy.Settings
@@ -12,6 +13,10 @@ namespace Greenergy.Settings
         public URLSettings EnergyDataAPI { get; set; }
 
         public int UpdateDelayInMinutes { get; set; } = 5;
+
+        // The earliest DateTime to get energinet data from
+        // when bootstrapping the database
+        public DateTime BootstrapDate { get; set; }
     }
 
     public class URLSettings

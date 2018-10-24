@@ -34,7 +34,7 @@ namespace Greenergy.Clients
             }
             else
             {
-                return DateTime.MinValue;
+                return _config.Value.BootstrapDate;
             }
         }
         public async Task<List<EmissionData>> GetLatest()

@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Greenergy;
 using Greenergy.Models;
+using Greenergy.Settings;
 using System.Linq;
 
 namespace Greenergy.Database
@@ -93,12 +94,15 @@ namespace Greenergy.Database
         {
             try
             {
-                var lastRecord = await _context.EmissionsCollection
+                var query = _context.EmissionsCollection
                             .Find(_ => true)
                             .Limit(1)
-                            .Sort(new BsonDocument("TimeStampUTC", -1))
-                            .FirstAsync();
-
+                            .Sort(new BsonDocument("TimeStampUTC", -1));
+                var lastRecord = await query.FirstOrDefaultAsync();
+                if (lastRecord == null)
+                {
+                    return DateTime.MinValue;
+                }
                 return lastRecord.TimeStampUTC;
             }
             catch (Exception ex)
@@ -111,6 +115,10 @@ namespace Greenergy.Database
         public async Task<List<EmissionData>> GetLatest()
         {
             DateTime latestTime = await MostRecentEmissionDataTimeStamp();
+            if (latestTime.CompareTo(DateTime.MinValue) == 0)
+            {
+                return null;
+            }
             try
             {
                 return await _context.EmissionsCollection

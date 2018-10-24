@@ -12,11 +12,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using Greenergy.Settings;
 
 namespace greenergy.api.energydata
 {
     public class Startup
     {
+        private const string ApiVersion = "v0.1";
         private IHostingEnvironment _env;
         private ILogger<Startup> _logger;
 
@@ -27,7 +29,7 @@ namespace greenergy.api.energydata
         {
             _config = config;
             _env = env;
-            _logger  = logger;
+            _logger = logger;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -48,9 +50,9 @@ namespace greenergy.api.energydata
             services.AddSwaggerGen(c =>
                 {
                     // Register the Swagger generator, defining 1 or more Swagger documents
-                    c.SwaggerDoc("v1", new Info
+                    c.SwaggerDoc(ApiVersion, new Info
                     {
-                        Version = "v1",
+                        Version = ApiVersion,
                         Title = "Greenergy Energy Data API",
                         Description = "API to retrieve energy consumption related data.",
                         Contact = new Contact
@@ -66,9 +68,13 @@ namespace greenergy.api.energydata
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-//            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+            //            app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
             app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint($"/swagger/{ApiVersion}/swagger.json", "Greenergy Energy Data API");
+            });
 
             if (_env.IsDevelopment())
             {
@@ -81,7 +87,7 @@ namespace greenergy.api.energydata
                 _logger.LogInformation($"Environment: {_env.EnvironmentName}");
             }
 
-//            app.UseHttpsRedirection();
+            //            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }

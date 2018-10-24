@@ -39,6 +39,8 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
         private ActionResult<DialogFlowResponseDTO> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
         {
+
+            
             DialogFlowResponseDTO response = new DialogFlowResponseDTO();
             response.fulfillmentText = "I honestly have no idea. But, in a few days I should know more. Please come back later!!";
             return response;

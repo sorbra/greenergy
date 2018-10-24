@@ -45,6 +45,7 @@ namespace Greenergy
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddLogging();
+                    var ctx = hostContext.Configuration.GetSection("application");
                     services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
 
                     services.AddTransient<IEnergyDataClient, EnergyDataClient>();

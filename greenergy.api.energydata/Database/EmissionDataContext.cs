@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Greenergy.Models;
+using Greenergy.Settings;
 
 namespace Greenergy.Database
 {
