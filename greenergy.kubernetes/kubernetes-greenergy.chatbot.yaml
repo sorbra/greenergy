@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: api-service
+  name: chatbot-service
 spec:
   selector:
-    app: greenergy-api
+    app: greenergy-chatbot
   ports:
   - protocol: TCP
     name: http
@@ -15,28 +15,28 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: greenergy-api-deployment
+  name: greenergy-chatbot-deployment
   labels:
-    app: greenergy-api
+    app: greenergy-chatbot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: greenergy-api
+      app: greenergy-chatbot
   template:
     metadata:
       labels:
-        app: greenergy-api
+        app: greenergy-chatbot
     spec:
       containers:
-      - name:  greenergy-api
-        image: sorbra/greenergy.api.server:0.0.1
+      - name:  greenergy-chatbot
+        image: sorbra/greenergy.chatbot:0.0.3
         imagePullPolicy: Always
         volumeMounts: 
         - name: "appsettings"
-          mountPath: "/app/greenergy.api.server/appsettings.json"
+          mountPath: "/app/greenergy.chatbot/appsettings.json"
           subPath: "appsettings.json"
       volumes:
       - name: "appsettings"
         configMap: 
-          name: "greenergy.api.server.appsettings"
+          name: "greenergy.chatbot.appsettings"

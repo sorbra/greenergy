@@ -21,6 +21,10 @@ namespace Greenergy.API
         {
             _config = config;
             _logger = logger;
+
+            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions/latest";
+            _logger.LogInformation("GreenergyAPIClient constructor: " + apiURL);
+
         }
 
         public async Task<DateTime> GetLatestTimeStamp()
@@ -38,6 +42,8 @@ namespace Greenergy.API
         public async Task<List<EmissionDataDTO>> GetLatest()
         {
             string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions/latest";
+
+            _logger.LogInformation("GetLatest: Calling" + apiURL);
 
             using (HttpClient client = NewClient())
             {

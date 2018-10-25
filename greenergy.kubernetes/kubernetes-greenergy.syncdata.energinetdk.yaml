@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: greenergy-syncdata-energinetdk-dep
+  labels:
+    app: greenergy-syncdata-energinetdk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greenergy-syncdata-energinetdk
+  template:
+    metadata:
+      labels:
+        app: greenergy-syncdata-energinetdk
+    spec:
+      containers:
+      - name:  greenergy-syncdata-energinetdk
+        image: sorbra/greenergy.syncdata.energinetdk:0.0.1
+        imagePullPolicy: Always
+        volumeMounts: 
+        - name: "appsettings"
+          mountPath: "/app/greenergy.syncdata.energinetdk/appsettings.json"
+          subPath: "appsettings.json"
+      volumes:
+      - name: "appsettings"
+        configMap: 
+          name: "greenergy.syncdata.energinetdk.appsettings"

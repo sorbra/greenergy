@@ -1,6 +1,6 @@
 {
   "MongoSettings": {
-    "ConnectionString": "mongodb://root:!dev123@green-mongo-dev-mongodb.default.svc.cluster.local:27017",
+    "ConnectionString": "mongodb://root:!dev123@green-mongo-dev-mongodb:27017",
     "Database": "GreenergyDB"
   },
   "Logging": {

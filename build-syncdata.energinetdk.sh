@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export DOCKER_TAG="sorbra/greenergy.data.energinet:0.0.1"
+export DOCKER_TAG="sorbra/greenergy.syncdata.energinetdk:0.0.1"
 
 # Build the docker container and tag it.
-docker build -t $DOCKER_TAG .
+docker build -t $DOCKER_TAG -f ./greenergy.syncdata.energinetdk/Dockerfile .
 
 # Push container to Docker Hub
 docker login -u sorbra

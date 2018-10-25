@@ -1,10 +1,4 @@
 {
-    "Application": {
-        "BootstrapDate": "2018-01-01T00:00",
-        "Name": "Greenergy Service",
-        "UserAgent": "Greenergy Data Synchronizer",
-        "UpdateDelayInMinutes": 5
-    },
     "GreenergyAPI": {
         "Protocol": "http",
         "Host": "api-service",

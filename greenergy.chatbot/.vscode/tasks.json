@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/greenergy.chatbot-fulfillment.csproj"
+                "${workspaceFolder}/greenergy.chatbot.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

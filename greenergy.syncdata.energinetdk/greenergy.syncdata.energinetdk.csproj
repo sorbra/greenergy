@@ -24,8 +24,9 @@
     <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0"/>
   </ItemGroup>
 
+<!--
   <ItemGroup>
     <Content Include="**\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
+-->
 </Project>
