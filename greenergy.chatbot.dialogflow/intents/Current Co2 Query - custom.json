@@ -1,0 +1,33 @@
+{
+  "id": "c2dc63d2-bf31-46c5-ae71-1c6e68407d80",
+  "parentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
+  "rootParentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
+  "name": "Current Co2 Query - custom",
+  "auto": true,
+  "contexts": [
+    "CurrentCo2Query-followup"
+  ],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "CurrentCo2Query.CurrentCo2Query-custom",
+      "affectedContexts": [],
+      "parameters": [],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": []
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": false,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1508189124811,
+  "fallbackIntent": false,
+  "events": []
+}

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using greenergy.chatbot_fulfillment.OutputFormatters;
 using Greenergy.API;
+using Greenergy.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -24,15 +25,12 @@ namespace greenergy.chatbot_fulfillment
 
         public IConfiguration _config { get; set; }
 
-        public Startup(IConfiguration config)
-        {
-            // var builder = new ConfigurationBuilder()
-            //     .SetBasePath(env.ContentRootPath)
-            //     .AddJsonFile("appsettings.json", optional: true)
-            //     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+        private ILogger<Startup> _logger;
 
-            // _config = builder.Build();
+        public Startup(IConfiguration config, ILogger<Startup> logger)
+        {
             _config = config;
+            _logger = logger;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -72,6 +70,8 @@ namespace greenergy.chatbot_fulfillment
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

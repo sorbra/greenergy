@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DOCKER_TAG="sorbra/greenergy.chatbot:0.0.3"
+export DOCKER_TAG="sorbra/greenergy.chatbot:0.0.4"
 
 # Build the docker container and tag it.
 docker build -t $DOCKER_TAG -f ./greenergy.chatbot/Dockerfile .

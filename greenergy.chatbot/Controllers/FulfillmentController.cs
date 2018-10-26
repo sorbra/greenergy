@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using greenergy.chatbot_fulfillment.RequestModels;
-using greenergy.chatbot_fulfillment.ResponseModels;
+using greenergy.chatbot_fulfillment.Models;
 using Greenergy.API;
+using Microsoft.Extensions.Logging;
 
 namespace greenergy.chatbot_fulfillment.Controllers
 {
@@ -16,13 +16,17 @@ namespace greenergy.chatbot_fulfillment.Controllers
         private const float kilometersPerKwh = 5f;
         private const float kwhPerHour = 10f;
 
-        private const string _handleChargeCarIntent = "projects/greenergy-3dbfe/agent/intents/5845fca2-2532-4aca-ab69-d89947557032";
+        private const string _handleChargeCarYESIntent = "projects/greenergy-3dbfe/agent/intents/07a5c59b-1bdc-4dc5-8788-5380b48c5324";
+        private const string _handleChargeCarNOIntent = "projects/greenergy-3dbfe/agent/intents/63256d8b-9a44-4dd3-829f-47dc8073bc8c";
         private const string _handleCurrentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
-        private IGreenergyAPIClient _greenergyAPIClient;
 
-        public FulfillmentController(IGreenergyAPIClient greenergyAPIClient)
+        private IGreenergyAPIClient _greenergyAPIClient;
+        private ILogger<FulfillmentController> _logger;
+
+        public FulfillmentController(IGreenergyAPIClient greenergyAPIClient, ILogger<FulfillmentController> logger)
         {
             _greenergyAPIClient = greenergyAPIClient;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -37,9 +41,17 @@ namespace greenergy.chatbot_fulfillment.Controllers
         public ActionResult<DialogFlowResponseDTO> Post([FromBody] DialogFlowRequestDTO request)
         {
             var intent = request.queryResult.intent.name;
-            if (intent.Equals(_handleChargeCarIntent))
+            if (intent.Equals(_handleChargeCarYESIntent))
             {
-                return HandleChargeCarIntent(request);
+                var response = HandleChargeCarIntent(request, true);
+
+                _logger.LogInformation(response.ToString());
+
+                return response;
+            }
+            else if (intent.Equals(_handleChargeCarNOIntent))
+            {
+                return HandleChargeCarIntent(request, false);
             }
             else if (intent.Equals(_handleCurrentCo2QueryIntent))
             {
@@ -58,20 +70,22 @@ namespace greenergy.chatbot_fulfillment.Controllers
             var currentEmission = emissions[0].Emission;
 
             DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-            response.fulfillmentText = $"{currentEmission}";
+            response.fulfillmentText = $"Current co2 emission is {currentEmission} grams co2 per kilowatt hour";
 
             return response;
         }
 
-        private ActionResult<DialogFlowResponseDTO> HandleChargeCarIntent(DialogFlowRequestDTO request)
+        private ActionResult<DialogFlowResponseDTO> HandleChargeCarIntent(DialogFlowRequestDTO request, Boolean doCharge)
         {
-            DateTime driveTime = request.queryResult.parameters.Time;
-            DateTime driveDate = request.queryResult.parameters.Date;
+            var driveSomewhereContext = request.queryResult.outputContexts[0];
+            var parameters = driveSomewhereContext.parameters;
 
-            float kilometers = request.queryResult.parameters.Kilometers;
-            float hoursNeeded = kilometers / kilometersPerKwh / kwhPerHour;
+            DateTime driveTime = parameters.time.ToUniversalTime();
+            DateTime driveDate = parameters.time.Date;
 
-            Boolean doCharge = request.queryResult.parameters.doCharge.Equals("yes");
+            float hoursNeeded = parameters.kilometers / kilometersPerKwh / kwhPerHour;
+
+            _logger.LogDebug($"HandleChargeCarIntent received parameters. Date={driveDate}, Time={driveTime.ToUniversalTime()}, Kilometers={parameters.kilometers}");
 
             // Retrieve the time zone for Copenhagen Denmark (Romance Standard Time).
             TimeZoneInfo cet;
@@ -82,12 +96,14 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
             catch (Exception)
             {
-                Console.WriteLine("Unable to retrieve the Romance Standard Time zone.");
+                _logger.LogCritical("HandleChargeCarIntent: Unable to retrieve the Romance Standard Time zone.");
             }
 
             DateTime chargeTime = new DateTime(driveDate.Year, driveDate.Month, driveDate.Day, driveTime.Hour, driveTime.Minute, driveTime.Second).AddHours(-hoursNeeded);
 
-            DialogFlowResponseDTO response = new DialogFlowResponseDTO();
+            var response = new DialogFlowResponseDTO();
+            response.outputContexts = request.queryResult.outputContexts;
+
             if (doCharge)
             {
                 response.fulfillmentText = $"I will charge your car. Please plug in your car no later than {chargeTime.DayOfWeek} at {chargeTime.ToShortTimeString()} to ensure timely charging.";

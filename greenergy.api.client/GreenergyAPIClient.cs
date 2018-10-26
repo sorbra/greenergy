@@ -43,8 +43,6 @@ namespace Greenergy.API
         {
             string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions/latest";
 
-            _logger.LogInformation("GetLatest: Calling" + apiURL);
-
             using (HttpClient client = NewClient())
             {
                 var stringTask = client.GetStringAsync(apiURL);

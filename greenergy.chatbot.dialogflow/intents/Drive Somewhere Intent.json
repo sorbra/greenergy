@@ -1,0 +1,84 @@
+{
+  "id": "5845fca2-2532-4aca-ab69-d89947557032",
+  "name": "Drive Somewhere Intent",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "affectedContexts": [
+        {
+          "name": "DriveSomewhereIntent-followup",
+          "parameters": {},
+          "lifespan": 2
+        }
+      ],
+      "parameters": [
+        {
+          "id": "583e79f3-8bad-48cc-829a-7ce59fd596ca",
+          "required": true,
+          "dataType": "@sys.number",
+          "name": "kilometers",
+          "value": "$kilometers",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "How many kilometers do you need to drive?"
+            }
+          ],
+          "isList": false
+        },
+        {
+          "id": "a82b26eb-c663-4602-aae6-fe4ec1287140",
+          "required": true,
+          "dataType": "@sys.date",
+          "name": "date",
+          "value": "$date",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "What day do you need to leave?"
+            }
+          ],
+          "isList": false
+        },
+        {
+          "id": "f8af3422-5266-4a22-9903-435b37f42c40",
+          "required": true,
+          "dataType": "@sys.time",
+          "name": "time",
+          "value": "$time",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "What time do you need to leave?"
+            }
+          ],
+          "isList": false
+        },
+        {
+          "id": "d28d3844-c9c6-4897-8631-4bfaacf9362f",
+          "dataType": "@sys.geo-city",
+          "name": "geo-city",
+          "value": "$geo-city",
+          "isList": false
+        }
+      ],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": "would you like me to charge your car for you?"
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": false,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1540547999,
+  "fallbackIntent": false,
+  "events": []
+}

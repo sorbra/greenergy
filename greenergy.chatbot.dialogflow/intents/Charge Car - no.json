@@ -1,0 +1,33 @@
+{
+  "id": "63256d8b-9a44-4dd3-829f-47dc8073bc8c",
+  "parentId": "5845fca2-2532-4aca-ab69-d89947557032",
+  "rootParentId": "5845fca2-2532-4aca-ab69-d89947557032",
+  "name": "Charge Car - no",
+  "auto": true,
+  "contexts": [
+    "DriveSomewhereIntent-followup"
+  ],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "DriveSomewhereIntent.DriveSomewhereIntent-no",
+      "affectedContexts": [],
+      "parameters": [],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": []
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1540547731,
+  "fallbackIntent": false,
+  "events": []
+}

@@ -1,0 +1,160 @@
+[
+  {
+    "id": "3c37d872-9c42-4220-bcfb-0f688b463393",
+    "data": [
+      {
+        "text": "drive to ",
+        "userDefined": false
+      },
+      {
+        "text": "copenhagen",
+        "alias": "geo-city",
+        "meta": "@sys.geo-city",
+        "userDefined": true
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "tomorrow",
+        "alias": "date",
+        "meta": "@sys.date",
+        "userDefined": false
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "at 10 am",
+        "alias": "time",
+        "meta": "@sys.time",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1540547999
+  },
+  {
+    "id": "a33b8e81-34e1-44a9-9851-a4c9479d173a",
+    "data": [
+      {
+        "text": "driving ",
+        "userDefined": false
+      },
+      {
+        "text": "tomorrow",
+        "alias": "date",
+        "meta": "@sys.date",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1540479619
+  },
+  {
+    "id": "c58540c1-ff81-487c-961e-ee0eac432f96",
+    "data": [
+      {
+        "text": "saturday",
+        "alias": "date",
+        "meta": "@sys.date",
+        "userDefined": false
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "at 10 am",
+        "alias": "time",
+        "meta": "@sys.time",
+        "userDefined": false
+      },
+      {
+        "text": " I need to drive ",
+        "userDefined": false
+      },
+      {
+        "text": "250",
+        "alias": "kilometers",
+        "meta": "@sys.number",
+        "userDefined": false
+      },
+      {
+        "text": " km",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1540476048
+  },
+  {
+    "id": "f9122f08-7dc2-44bd-ac94-70d80afed245",
+    "data": [
+      {
+        "text": "I need to leave ",
+        "userDefined": false
+      },
+      {
+        "text": "tomorrow",
+        "alias": "date",
+        "meta": "@sys.date",
+        "userDefined": false
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "at 8am",
+        "alias": "time",
+        "meta": "@sys.time",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1539632119
+  },
+  {
+    "id": "491ca9a6-8e52-4180-8d7b-72034e1254a9",
+    "data": [
+      {
+        "text": "I need to drive ",
+        "userDefined": false
+      },
+      {
+        "text": "150",
+        "alias": "kilometers",
+        "meta": "@sys.number",
+        "userDefined": false
+      },
+      {
+        "text": " kms",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1539632119
+  },
+  {
+    "id": "26291d73-8b61-44ad-bd6d-e3a32dccbd20",
+    "data": [
+      {
+        "text": "200",
+        "alias": "kilometers",
+        "meta": "@sys.number",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1539632119
+  }
+]
