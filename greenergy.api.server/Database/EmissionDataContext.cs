@@ -25,5 +25,13 @@ namespace Greenergy.Database
                 return _database.GetCollection<EmissionData>("Emissions");
             }
         }
+
+        public IMongoCollection<PrognosisData> PrognosisCollection
+        {
+            get
+            {
+                return _database.GetCollection<PrognosisData>("Prognoses");
+            }
+        }
     }
 }

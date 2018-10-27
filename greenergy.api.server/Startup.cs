@@ -47,7 +47,7 @@ namespace greenergy.api.server
                 _logger.LogInformation(ms.Database);
             });
 
-            services.AddTransient<IEmissionsRepository, MongoEmissionsRepository>();
+            services.AddTransient<IEmissionsRepository, EmissionsRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
