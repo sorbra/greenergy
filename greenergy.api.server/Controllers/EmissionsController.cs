@@ -25,15 +25,15 @@ namespace greenergy.api.server.Controllers
         }
 
         // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<EmissionData>> Get(int hours = 1)
-        {
-            var emissions = _emissionsRepository.GetRecentEmissionData(hours).Result as List<EmissionData>;
-            return emissions.OrderByDescending(e => e.TimeStampUTC).ToList();
-        }
+        // [HttpGet]
+        // public ActionResult<IEnumerable<EmissionData>> Get(int hours = 1)
+        // {
+        //     var emissions = _emissionsRepository.GetRecentEmissionData(hours).Result as List<EmissionData>;
+        //     return emissions.OrderByDescending(e => e.TimeStampUTC).ToList();
+        // }
 
         [HttpGet("{when}")]
-        public ActionResult<List<EmissionData>> GetLatest(string when)
+        public ActionResult<List<EmissionData>> GetMostRecentEmissions(string when)
         {
             if (when.ToLower().Equals("latest"))
             {
@@ -42,28 +42,15 @@ namespace greenergy.api.server.Controllers
             return null;
         }
 
-        // POST api/values
+        // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
         [HttpPost]
-        public ActionResult Post([FromBody] List<EmissionData> emissions )
+        public ActionResult UpdateEmissions([FromBody] List<EmissionData> emissions )
         {
-            var headers = Request.Headers;
             _emissionsRepository.UpdateEmissionData(emissions);
 
-            _logger.LogInformation($"Received {emissions.Count} EmissionData elements");
+            _logger.LogDebug($"Received {emissions.Count} EmissionData elements");
 
             return Ok();
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

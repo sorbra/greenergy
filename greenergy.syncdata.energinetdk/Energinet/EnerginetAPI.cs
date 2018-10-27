@@ -5,22 +5,43 @@ using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 using Greenergy.API;
+using Greenergy.API.Models;
+using Greenergy.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Greenergy.Energinet
 {
-    public class EnerginetAPI
+    public class EnerginetAPI : IEnerginetAPI
     {
-        public static async Task<List<EmissionDataDTO>> GetRecentEmissions(DateTime noEarlierThan)
+        private IOptions<ApplicationSettings> _config;
+
+        public EnerginetAPI(IOptions<ApplicationSettings> config)
+        {
+            _config = config;
+        }
+        public async Task<List<EmissionDataDTO>> GetRecentEmissions(DateTime noEarlierThan)
+        {
+
+            var request = EnerginetBlobCreateRequestDTO.NewEmissionsRequest(noEarlierThan);
+            return await EnerginetGet(request);
+        }
+        
+        public async Task<List<EmissionDataDTO>> GetCurrentEmissionsPrognosis()
+        {
+            var request = EnerginetBlobCreateRequestDTO.NewPrognosisRequest();
+            return await EnerginetGet(request);
+        }
+
+        public async Task<List<EmissionDataDTO>> EnerginetGet(EnerginetBlobCreateRequestDTO request)
         {
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Add("User-Agent", "Greenergy Data Synchronizer");
+                client.DefaultRequestHeaders.Add("User-Agent", _config.Value.UserAgent);
 
-                var jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(EnerginetBlobCreateRequestDTO.NewEmissionsRequest(noEarlierThan));
-
+                var jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(request);
 
                 var blobCreateResponse = await client.PostAsync(EnerginetResource.Co2PrognosisBlobCreateURL, new StringContent(jsonRequest));
 

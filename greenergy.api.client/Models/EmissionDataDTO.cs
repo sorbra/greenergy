@@ -1,6 +1,6 @@
 using System;
 
-namespace Greenergy.API
+namespace Greenergy.API.Models
 {
     public class EmissionDataDTO
     {
@@ -16,5 +16,6 @@ namespace Greenergy.API
         public DateTime TimeStampUTC { get; set; }
         
         public string Region { get; set; }      
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
     }
 }

@@ -7,29 +7,26 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Runtime.Serialization.Json;
+using Greenergy.API.Models;
 
 namespace Greenergy.API
 {
-    public class GreenergyAPIClient : IGreenergyAPIClient
+    public class GreenergyAPI : IGreenergyAPI
     {
         private IOptions<GreenergyAPISettings> _config;
-        private ILogger<GreenergyAPIClient> _logger;
+        private ILogger<GreenergyAPI> _logger;
 
-        public GreenergyAPIClient(
+        public GreenergyAPI(
             IOptions<GreenergyAPISettings> config,
-            ILogger<GreenergyAPIClient> logger)
+            ILogger<GreenergyAPI> logger)
         {
             _config = config;
             _logger = logger;
-
-            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions/latest";
-            _logger.LogInformation("GreenergyAPIClient constructor: " + apiURL);
-
         }
 
-        public async Task<DateTime> GetLatestTimeStamp()
+        public async Task<DateTime> GetMostRecentEmissionsTimeStamp()
         {
-            var latestEmissions = await GetLatest();
+            var latestEmissions = await GetMostRecentEmissions();
             if (latestEmissions != null && latestEmissions.Count > 0)
             {
                 return latestEmissions[0].TimeStampUTC;
@@ -39,21 +36,14 @@ namespace Greenergy.API
                 return DateTime.MinValue;
             }
         }
-        public async Task<List<EmissionDataDTO>> GetLatest()
+        public async Task<List<EmissionDataDTO>> GetMostRecentEmissions()
         {
             string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions/latest";
 
             using (HttpClient client = NewClient())
             {
                 var stringTask = client.GetStringAsync(apiURL);
-                var json = await stringTask;
-
-                var emissions = Newtonsoft.Json.JsonConvert.DeserializeObject<List<EmissionDataDTO>>(json);
-
-                //var serializer = new DataContractJsonSerializer(typeof(List<EmissionData>));
-
-                // var emissions = serializer.ReadObject(await streamTask) as List<EmissionData>;
-                return emissions;
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<EmissionDataDTO>>(await stringTask);
             }
         }
 
@@ -66,15 +56,36 @@ namespace Greenergy.API
             return client;
         }
 
-        public async Task UpdateEmissionData(List<EmissionDataDTO> emissions)
+        public async Task UpdateEmissions(List<EmissionDataDTO> emissions)
         {
             string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions";
 
-            _logger.LogInformation($"Sending {emissions.Count} EmissionData elements to EnergyData API.");
+            _logger.LogDebug($"Sending {emissions.Count} EmissionData elements to EnergyData API.");
 
             using (HttpClient client = NewClient())
             {
                 var jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(emissions);
+
+                var content = new StringContent(jsonRequest,Encoding.UTF8,"application/json");
+
+                var apiResponse = await client.PostAsync( apiURL, content );
+
+                if (!apiResponse.IsSuccessStatusCode)
+                {
+                    throw new Exception($"Failed to save data: {apiResponse.StatusCode} - {apiResponse.ReasonPhrase}");
+                }
+            }
+        }
+
+        public async Task UpdateEmissionsPrognosis(List<EmissionDataDTO> prognosis)
+        {
+            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/prognosis";
+
+            _logger.LogDebug($"Sending {prognosis.Count} Emission Prognosis data elements to EnergyData API.");
+
+            using (HttpClient client = NewClient())
+            {
+                var jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(prognosis);
 
                 var content = new StringContent(jsonRequest,Encoding.UTF8,"application/json");
 

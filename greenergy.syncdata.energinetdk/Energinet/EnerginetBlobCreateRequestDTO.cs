@@ -19,19 +19,36 @@ namespace Greenergy.Energinet
             var request = new EnerginetBlobCreateRequestDTO();
 
             request.resource_id = EnerginetResource.Co2EmissionsResourceID;
-//            sort = "Minutes5, asc";
-//            request.limit = limit;  
 
-            var filter = new Filter();
-            filter.name = "Minutes5UTC";
-            filter.@operator = ">=";
-//            filter.value = DateTime.UtcNow.AddHours(-hours).ToString("yyyy-MM-dd HH:mm");
-            filter.value = noEarlierThan.ToUniversalTime().ToString("yyyy-MM-dd HH:mm");
+            var filter = new Filter()
+            {
+                name = "Minutes5UTC",
+                @operator = ">=",
+                value = noEarlierThan.ToUniversalTime().ToString("yyyy-MM-dd HH:mm")
+            };
             request.filters.Add(filter);
 
             return request;
         }
-        public EnerginetBlobCreateRequestDTO ()
+
+        public static EnerginetBlobCreateRequestDTO NewPrognosisRequest()
+        {
+            var request = new EnerginetBlobCreateRequestDTO();
+
+            request.resource_id = EnerginetResource.Co2PrognosisResourceID;
+
+            var filter = new Filter()
+            {
+                name = "Minutes5UTC",
+                @operator = ">=",
+                value = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm")
+            };
+            request.filters.Add(filter);
+
+            return request;
+        }
+
+        public EnerginetBlobCreateRequestDTO()
         {
             format = "json";
             filters = new List<Filter>();
@@ -39,7 +56,7 @@ namespace Greenergy.Energinet
         public List<Filter> filters { get; set; }
         public string format { get; set; }
         public string resource_id { get; set; }
-//        public string sort { get; set; }
+        //        public string sort { get; set; }
     }
 
     public class Filter
@@ -47,7 +64,7 @@ namespace Greenergy.Energinet
         public string name { get; set; }
         public string @operator { get; set; }
         public string value { get; set; }
-//        public int limit { get; set; }
+        //        public int limit { get; set; }
     }
 
 

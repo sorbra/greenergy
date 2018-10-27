@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using greenergy.chatbot_fulfillment.Models;
 using Greenergy.API;
 using Microsoft.Extensions.Logging;
+using Greenergy.API.Models;
 
 namespace greenergy.chatbot_fulfillment.Controllers
 {
@@ -20,19 +21,19 @@ namespace greenergy.chatbot_fulfillment.Controllers
         private const string _handleChargeCarNOIntent = "projects/greenergy-3dbfe/agent/intents/63256d8b-9a44-4dd3-829f-47dc8073bc8c";
         private const string _handleCurrentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
 
-        private IGreenergyAPIClient _greenergyAPIClient;
+        private IGreenergyAPI _greenergyAPI;
         private ILogger<FulfillmentController> _logger;
 
-        public FulfillmentController(IGreenergyAPIClient greenergyAPIClient, ILogger<FulfillmentController> logger)
+        public FulfillmentController(IGreenergyAPI greenergyAPI, ILogger<FulfillmentController> logger)
         {
-            _greenergyAPIClient = greenergyAPIClient;
+            _greenergyAPI = greenergyAPI;
             _logger = logger;
         }
 
         [HttpGet]
         public ActionResult<List<EmissionDataDTO>> Getemissions()
         {
-            var emissions = _greenergyAPIClient.GetLatest().Result;
+            var emissions = _greenergyAPI.GetMostRecentEmissions().Result;
             return emissions;
         }
 
@@ -65,7 +66,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
         private ActionResult<DialogFlowResponseDTO> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
         {
-            var emissions = _greenergyAPIClient.GetLatest().Result;
+            var emissions = _greenergyAPI.GetMostRecentEmissions().Result;
 
             var currentEmission = emissions[0].Emission;
 
