@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name:  greenergy-api
-        image: sorbra/greenergy.api.server:0.0.2
+        image: sorbra/greenergy.api.server:0.0.3
         imagePullPolicy: Always
         volumeMounts: 
         - name: "appsettings"

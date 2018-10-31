@@ -13,11 +13,11 @@ namespace Greenergy.Database
 {
     public class EmissionsRepository : IEmissionsRepository
     {
-        private readonly EmissionDataContext _context = null;
+        private readonly IEmissionDataContext _context = null;
 
-        public EmissionsRepository(IOptions<MongoSettings> settings)
+        public EmissionsRepository(IEmissionDataContext context)
         {
-            _context = new EmissionDataContext(settings);
+            _context = context;
         }
 
         public async Task<IEnumerable<EmissionData>> GetRecentEmissionData(int hours)

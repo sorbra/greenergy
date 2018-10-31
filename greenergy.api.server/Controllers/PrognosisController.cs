@@ -24,23 +24,34 @@ namespace greenergy.api.server.Controllers
             _prognosisRepository = prognosisRepository;
         }
 
-        // GET api/values
-        // [HttpGet]
-        // public ActionResult<IEnumerable<EmissionData>> Get(int hours = 1)
-        // {
-        //     var emissions = _emissionsRepository.GetRecentEmissionData(hours).Result as List<EmissionData>;
-        //     return emissions.OrderByDescending(e => e.TimeStampUTC).ToList();
-        // }
-
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
         [HttpPost]
-        public ActionResult UpdatePrognoses([FromBody] List<EmissionData> prognoses )
+        public async Task<ActionResult> UpdatePrognoses([FromBody] List<PrognosisData> prognoses )
         {
-            _prognosisRepository.UpdatePrognosisData(prognoses);
+            await _prognosisRepository.UpdatePrognosisData(prognoses);
 
             _logger.LogDebug($"Received {prognoses.Count} EmissionData elements");
 
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<PrognosisData>>> GetPrognosisMinimum()
+        {
+            try
+            {
+                var result = await _prognosisRepository.PrognosisMinimum();
+                if (result!=null)
+                {
+                    return result;
+                }
+                return new List<PrognosisData>();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Exception in PrognosisController.GetPrognosisMinimum", null);
+            }
+            return null;
         }
     }
 }

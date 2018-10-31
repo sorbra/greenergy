@@ -11,61 +11,30 @@ using System.Linq;
 
 namespace Greenergy.Database
 {
-    public class PrognosisRepository : IEmissionsRepository
+    public class PrognosisRepository : IPrognosisRepository
     {
-        private readonly PrognosisDataContext _context = null;
+        private readonly IEmissionDataContext _context;
 
-        public PrognosisRepository(IOptions<MongoSettings> settings)
+        public PrognosisRepository(IEmissionDataContext context)
         {
-            _context = new PrognosisDataContext(settings);
+            //            _context = new EmissionDataContext(settings);
+            _context = context;
         }
 
-        public async Task<IEnumerable<EmissionData>> GetRecentEmissionData(int hours)
+        public async Task UpdatePrognosisData(List<PrognosisData> prognoses)
         {
-            DateTime startTime = DateTime.Now.AddHours(-hours);
-
-            try
+            foreach (var pg in prognoses)
             {
-                return await _context.EmissionsCollection
-                        .Find(x => x.TimeStampUTC.CompareTo(startTime) > 0)
-                        .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
-
-        public async Task<List<EmissionData>> GetEmissionDataSince(DateTime noEarlierThan)
-        {
-            try
-            {
-                return await _context.EmissionsCollection
-                        .Find(x => x.TimeStampUTC.CompareTo(noEarlierThan) >= 0)
-                        .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
-
-        public async Task UpdateEmissionData(List<EmissionData> emissions)
-        {
-            foreach (var ed in emissions)
-            {
-                var filter = Builders<EmissionData>.Filter.Eq(edx => edx.Region, ed.Region)
-                           & Builders<EmissionData>.Filter.Eq(edx => edx.TimeStampUTC, ed.TimeStampUTC);
-                var update = Builders<EmissionData>.Update
-                                .Set(edx => edx.Emission, ed.Emission)
-                                .CurrentDate(edx => edx.CreatedOn);
+                var filter = Builders<PrognosisData>.Filter.Eq(pgx => pgx.Region, pg.Region)
+                           & Builders<PrognosisData>.Filter.Eq(pgx => pgx.TimeStampUTC, pg.TimeStampUTC);
+                var update = Builders<PrognosisData>.Update
+                                .Set(pgx => pgx.Emission, pg.Emission)
+                                .CurrentDate(pgx => pgx.CreatedOn);
                 var options = new UpdateOptions();
                 options.IsUpsert = true;
                 try
                 {
-                    await _context.EmissionsCollection.UpdateOneAsync(filter, update, options);
+                    await _context.PrognosisCollection.UpdateOneAsync(filter, update, options);
                 }
                 catch (Exception ex)
                 {
@@ -73,49 +42,32 @@ namespace Greenergy.Database
                     throw ex;
                 }
             }
-
         }
 
-        public async Task<DateTime> MostRecentEmissionDataTimeStamp()
+        public async Task<List<PrognosisData>> PrognosisMinimum()
         {
             try
             {
-                var query = _context.EmissionsCollection
-                            .Find(_ => true)
-                            .Limit(1)
-                            .Sort(new BsonDocument("TimeStampUTC", -1));
-                var lastRecord = await query.FirstOrDefaultAsync();
-                if (lastRecord == null)
+                var now = DateTime.Now;
+                var min = await _context.PrognosisCollection
+                        .Find(x => x.TimeStampUTC.CompareTo(now) >= 0)
+                        .SortBy(x => x.Emission)
+                        .Limit(10)
+                        .FirstOrDefaultAsync();
+                if (min != null)
                 {
-                    return DateTime.MinValue;
+                    return await _context.PrognosisCollection
+                            .Find(x => x.Emission == min.Emission)
+                            .ToListAsync();
                 }
-                return lastRecord.TimeStampUTC;
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
-
-        public async Task<List<EmissionData>> GetLatest()
-        {
-            DateTime latestTime = await MostRecentEmissionDataTimeStamp();
-            if (latestTime.CompareTo(DateTime.MinValue) == 0)
-            {
                 return null;
             }
-            try
-            {
-                return await _context.EmissionsCollection
-                            .Find(ed => ed.TimeStampUTC.CompareTo(latestTime) == 0)
-                            .ToListAsync();
-            }
             catch (Exception ex)
             {
                 // log or manage the exception
                 throw ex;
             }
         }
+
     }
 }

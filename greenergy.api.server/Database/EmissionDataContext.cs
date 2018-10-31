@@ -5,7 +5,7 @@ using Greenergy.Settings;
 
 namespace Greenergy.Database
 {
-    public class EmissionDataContext
+    public class EmissionDataContext: IEmissionDataContext
     {
         private readonly IMongoDatabase _database = null;
 

@@ -6,6 +6,7 @@ namespace Greenergy.Database
 {
     public interface IPrognosisRepository
     {
-        Task UpdatePrognosisData(List<EmissionData> prognoses);
+        Task UpdatePrognosisData(List<PrognosisData> prognoses);
+        Task<List<PrognosisData>> PrognosisMinimum();
     }
 }

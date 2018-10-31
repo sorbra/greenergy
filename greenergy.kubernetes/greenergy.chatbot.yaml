@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name:  greenergy-chatbot
-        image: sorbra/greenergy.chatbot:0.0.5
+        image: sorbra/greenergy.chatbot:0.0.6
         imagePullPolicy: Always
         volumeMounts: 
         - name: "appsettings"

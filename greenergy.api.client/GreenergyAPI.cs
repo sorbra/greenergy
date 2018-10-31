@@ -40,11 +40,20 @@ namespace Greenergy.API
         {
             string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions/latest";
 
-            using (HttpClient client = NewClient())
+            try
             {
-                var stringTask = client.GetStringAsync(apiURL);
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<EmissionDataDTO>>(await stringTask);
+                using (HttpClient client = NewClient())
+                {
+                    var jsonString = await client.GetStringAsync(apiURL);
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<List<EmissionDataDTO>>(jsonString);
+                }
+
             }
+            catch (System.Exception ex)
+            {
+                _logger.LogCritical(ex,"GreenergyAPI.GetMostRecentEmissions",null);
+            }
+            return null;
         }
 
         private HttpClient NewClient()
@@ -60,15 +69,15 @@ namespace Greenergy.API
         {
             string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/emissions";
 
-            _logger.LogDebug($"Sending {emissions.Count} EmissionData elements to EnergyData API.");
+            _logger.LogDebug($"Sending {emissions.Count} EmissionData elements to EnergyData API at {apiURL}");
 
             using (HttpClient client = NewClient())
             {
                 var jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(emissions);
 
-                var content = new StringContent(jsonRequest,Encoding.UTF8,"application/json");
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                var apiResponse = await client.PostAsync( apiURL, content );
+                var apiResponse = await client.PostAsync(apiURL, content);
 
                 if (!apiResponse.IsSuccessStatusCode)
                 {
@@ -87,9 +96,9 @@ namespace Greenergy.API
             {
                 var jsonRequest = Newtonsoft.Json.JsonConvert.SerializeObject(prognosis);
 
-                var content = new StringContent(jsonRequest,Encoding.UTF8,"application/json");
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                var apiResponse = await client.PostAsync( apiURL, content );
+                var apiResponse = await client.PostAsync(apiURL, content);
 
                 if (!apiResponse.IsSuccessStatusCode)
                 {

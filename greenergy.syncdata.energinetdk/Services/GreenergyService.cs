@@ -84,7 +84,7 @@ namespace Greenergy.Services
 
                 _logger.LogInformation("Received " + prognosis.Count + " prognosis records from energinet.dk");
 
-//                await _greenergyAPI.UpdateEmissionsPrognosis(prognosis);
+                await _greenergyAPI.UpdateEmissionsPrognosis(prognosis);
             }
             catch (System.Exception ex)
             {

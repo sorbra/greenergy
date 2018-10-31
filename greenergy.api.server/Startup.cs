@@ -48,6 +48,8 @@ namespace greenergy.api.server
             });
 
             services.AddTransient<IEmissionsRepository, EmissionsRepository>();
+            services.AddTransient<IPrognosisRepository, PrognosisRepository>();
+            services.AddTransient<IEmissionDataContext, EmissionDataContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

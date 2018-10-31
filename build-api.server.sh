@@ -1,15 +1,15 @@
 #!/bin/bash
 
-cd ./greenergy.api.server
+source  $(dirname "$0")/set-docker-tags.sh
 
-export DOCKER_TAG="sorbra/greenergy.api.server:0.0.2"
+echo Tag: $DOCKER_TAG_API
 
 # Build the docker container and tag it.
-docker build -t $DOCKER_TAG .
+docker build -t $DOCKER_TAG_API -f ./greenergy.api.server/Dockerfile .
 
 # Push container to Docker Hub
 docker login -u sorbra
-docker push "$DOCKER_TAG"
+docker push "$DOCKER_TAG_API"
 
 cd ..
 

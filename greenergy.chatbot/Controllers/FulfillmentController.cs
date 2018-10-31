@@ -42,7 +42,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
             catch (System.Exception ex)
             {
-                _logger.LogError(ex, "Exception in FulfillmentController.Getemissions", null);
+                _logger.LogError(ex, "FulfillmentController.Getemissions", null);
                 return null;
             }
         }
@@ -82,12 +82,16 @@ namespace greenergy.chatbot_fulfillment.Controllers
         {
             var emissions = await _greenergyAPI.GetMostRecentEmissions();
 
-            var currentEmission = emissions[0].Emission;
+            if (emissions != null)
+            {
+                var currentEmission = emissions[0].Emission;
 
-            DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-            response.fulfillmentText = $"Current co2 emission is {currentEmission} grams co2 per kilowatt hour";
+                DialogFlowResponseDTO response = new DialogFlowResponseDTO();
+                response.fulfillmentText = $"Current co2 emission is {currentEmission} grams co2 per kilowatt hour";
 
-            return response;
+                return response;
+            }
+            return null;
         }
 
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleChargeCarIntent(DialogFlowRequestDTO request, Boolean doCharge)
