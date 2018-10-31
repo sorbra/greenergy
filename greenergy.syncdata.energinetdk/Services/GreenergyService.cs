@@ -43,7 +43,7 @@ namespace Greenergy.Services
             _applicationLifetime.ApplicationStopping.Register(OnStopping);
             _applicationLifetime.ApplicationStopped.Register(OnStopped);
 
-            _logger.LogDebug("Service started: " +  _config.Value.Name);
+            _logger.LogDebug("Service started: " + _config.Value.Name);
 
             _emissionsSyncTimer = new Timer(SyncEmissionData, null, TimeSpan.Zero, TimeSpan.FromSeconds(_config.Value.EmissionsSyncRateInMinutes * 60));
             _prognosisSyncTimer = new Timer(SyncPrognosisData, null, TimeSpan.Zero, TimeSpan.FromSeconds(_config.Value.PrognosisSyncRateInMinutes * 60));
@@ -54,28 +54,42 @@ namespace Greenergy.Services
             return Task.CompletedTask;
         }
 
-        private void SyncEmissionData(object state)
+        private async void SyncEmissionData(object state)
         {
-            var noEarlierThan = _greenergyAPI.GetMostRecentEmissionsTimeStamp().Result;
-
-            if (noEarlierThan.CompareTo(DateTime.MinValue) == 0)
+            try
             {
-                noEarlierThan = _config.Value.BootstrapDate;
+                var noEarlierThan = await _greenergyAPI.GetMostRecentEmissionsTimeStamp();
+
+                if (noEarlierThan.CompareTo(DateTime.MinValue) == 0)
+                {
+                    noEarlierThan = _config.Value.BootstrapDate;
+                }
+
+                var emissions = await _energinetAPI.GetRecentEmissions(noEarlierThan);
+
+                _logger.LogInformation("Received " + emissions.Count + " emissions records from energinet.dk that are new since " + noEarlierThan.ToString());
+
+                await _greenergyAPI.UpdateEmissions(emissions);
             }
-
-            var emissions = _energinetAPI.GetRecentEmissions(noEarlierThan).Result;
-
-            _logger.LogInformation("Received " + emissions.Count + " emissions records from energinet.dk that are new since " + noEarlierThan.ToString());
-
-            _greenergyAPI.UpdateEmissions(emissions).Wait();
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Exception in GreenergyService.SyncEmissionData", null);
+            }
         }
-        private void SyncPrognosisData(object state)
+        private async void SyncPrognosisData(object state)
         {
-            var prognosis = _energinetAPI.GetCurrentEmissionsPrognosis().Result;
+            try
+            {
+                var prognosis = await _energinetAPI.GetCurrentEmissionsPrognosis();
 
-            _logger.LogInformation("Received " + prognosis.Count + " prognosis records from energinet.dk");
+                _logger.LogInformation("Received " + prognosis.Count + " prognosis records from energinet.dk");
 
-            _greenergyAPI.UpdateEmissionsPrognosis(prognosis).Wait();
+//                await _greenergyAPI.UpdateEmissionsPrognosis(prognosis);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Exception in GreenergyService.SyncPrognosisData", null);
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

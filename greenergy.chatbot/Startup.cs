@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using greenergy.chatbot_fulfillment;
 using greenergy.chatbot_fulfillment.OutputFormatters;
 using Greenergy.API;
 using Greenergy.Middleware;
@@ -37,6 +38,7 @@ namespace greenergy.chatbot_fulfillment
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<GreenergyAPISettings>(_config.GetSection("GreenergyAPI"));
+            services.Configure<FulfillmentSettings>(_config.GetSection("Fulfillment"));
 
             services.AddMvc(config =>
             {

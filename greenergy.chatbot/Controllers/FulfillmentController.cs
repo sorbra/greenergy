@@ -7,6 +7,7 @@ using greenergy.chatbot_fulfillment.Models;
 using Greenergy.API;
 using Microsoft.Extensions.Logging;
 using Greenergy.API.Models;
+using Microsoft.Extensions.Options;
 
 namespace greenergy.chatbot_fulfillment.Controllers
 {
@@ -23,50 +24,63 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
         private IGreenergyAPI _greenergyAPI;
         private ILogger<FulfillmentController> _logger;
+        private IOptions<FulfillmentSettings> _config;
 
-        public FulfillmentController(IGreenergyAPI greenergyAPI, ILogger<FulfillmentController> logger)
+        public FulfillmentController(IGreenergyAPI greenergyAPI, ILogger<FulfillmentController> logger, IOptions<FulfillmentSettings> config)
         {
             _greenergyAPI = greenergyAPI;
             _logger = logger;
+            _config = config;
         }
 
         [HttpGet]
-        public ActionResult<List<EmissionDataDTO>> Getemissions()
+        public async Task<ActionResult<List<EmissionDataDTO>>> Getemissions()
         {
-            var emissions = _greenergyAPI.GetMostRecentEmissions().Result;
-            return emissions;
+            try
+            {
+                return await _greenergyAPI.GetMostRecentEmissions();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Exception in FulfillmentController.Getemissions", null);
+                return null;
+            }
         }
 
         // POST api/values
         [HttpPost]
-        public ActionResult<DialogFlowResponseDTO> Post([FromBody] DialogFlowRequestDTO request)
+        public async Task<ActionResult<DialogFlowResponseDTO>> Fulfill([FromBody] DialogFlowRequestDTO request)
         {
-            var intent = request.queryResult.intent.name;
-            if (intent.Equals(_handleChargeCarYESIntent))
+            try
             {
-                var response = HandleChargeCarIntent(request, true);
-
-                _logger.LogInformation(response.ToString());
-
-                return response;
+                var intent = request.queryResult.intent.name;
+                if (intent.Equals(_handleChargeCarYESIntent))
+                {
+                    return await HandleChargeCarIntent(request, true);
+                }
+                else if (intent.Equals(_handleChargeCarNOIntent))
+                {
+                    return await HandleChargeCarIntent(request, false);
+                }
+                else if (intent.Equals(_handleCurrentCo2QueryIntent))
+                {
+                    return await HandleCurrentCo2QueryIntent(request);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-            else if (intent.Equals(_handleChargeCarNOIntent))
+            catch (System.Exception ex)
             {
-                return HandleChargeCarIntent(request, false);
-            }
-            else if (intent.Equals(_handleCurrentCo2QueryIntent))
-            {
-                return HandleCurrentCo2QueryIntent(request);
-            }
-            else
-            {
-                return NotFound();
+                _logger.LogError(ex, "Exception in FulfillmentController.Fulfill", null);
+                return null;
             }
         }
 
-        private ActionResult<DialogFlowResponseDTO> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
+        private async Task<ActionResult<DialogFlowResponseDTO>> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
         {
-            var emissions = _greenergyAPI.GetMostRecentEmissions().Result;
+            var emissions = await _greenergyAPI.GetMostRecentEmissions();
 
             var currentEmission = emissions[0].Emission;
 
@@ -76,7 +90,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
             return response;
         }
 
-        private ActionResult<DialogFlowResponseDTO> HandleChargeCarIntent(DialogFlowRequestDTO request, Boolean doCharge)
+        private async Task<ActionResult<DialogFlowResponseDTO>> HandleChargeCarIntent(DialogFlowRequestDTO request, Boolean doCharge)
         {
             var driveSomewhereContext = request.queryResult.outputContexts[0];
             var parameters = driveSomewhereContext.parameters;
@@ -86,18 +100,18 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
             float hoursNeeded = parameters.kilometers / kilometersPerKwh / kwhPerHour;
 
-            _logger.LogDebug($"HandleChargeCarIntent received parameters. Date={driveDate}, Time={driveTime.ToUniversalTime()}, Kilometers={parameters.kilometers}");
-
             // Retrieve the time zone for Copenhagen Denmark (Romance Standard Time).
             TimeZoneInfo cet;
+            String tzName = _config.Value.TimeZone; // "Romance Standard Time"; // "Europe/Copenhagen"; 
             try
             {
-                cet = TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time");
+                cet = TimeZoneInfo.FindSystemTimeZoneById(tzName);
                 driveTime = TimeZoneInfo.ConvertTime(driveTime, cet);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.LogCritical("HandleChargeCarIntent: Unable to retrieve the Romance Standard Time zone.");
+                _logger.LogCritical(ex, $"HandleChargeCarIntent: Unable to retrieve the {tzName} Time zone.");
+                throw ex;
             }
 
             DateTime chargeTime = new DateTime(driveDate.Year, driveDate.Month, driveDate.Day, driveTime.Hour, driveTime.Minute, driveTime.Second).AddHours(-hoursNeeded);

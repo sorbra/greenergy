@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace greenergy.api.server.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class EmissionsController : ControllerBase
@@ -18,39 +18,48 @@ namespace greenergy.api.server.Controllers
         private ILogger<EmissionsController> _logger;
         private IEmissionsRepository _emissionsRepository;
 
-        public EmissionsController (ILogger<EmissionsController> logger, IEmissionsRepository emissionsRepository)
+        public EmissionsController(ILogger<EmissionsController> logger, IEmissionsRepository emissionsRepository)
         {
             _logger = logger;
             _emissionsRepository = emissionsRepository;
         }
 
-        // GET api/values
-        // [HttpGet]
-        // public ActionResult<IEnumerable<EmissionData>> Get(int hours = 1)
-        // {
-        //     var emissions = _emissionsRepository.GetRecentEmissionData(hours).Result as List<EmissionData>;
-        //     return emissions.OrderByDescending(e => e.TimeStampUTC).ToList();
-        // }
-
         [HttpGet("{when}")]
-        public ActionResult<List<EmissionData>> GetMostRecentEmissions(string when)
+        public async Task<ActionResult<List<EmissionData>>> GetMostRecentEmissions(string when)
         {
-            if (when.ToLower().Equals("latest"))
+            try
             {
-                return _emissionsRepository.GetLatest().Result;
+                if (when.ToLower().Equals("latest"))
+                {
+                    return await _emissionsRepository.GetLatest();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Exception in EmissionsController.GetMostRecentEmissions", null);
             }
             return null;
         }
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
         [HttpPost]
-        public ActionResult UpdateEmissions([FromBody] List<EmissionData> emissions )
+        public async Task<ActionResult> UpdateEmissions([FromBody] List<EmissionData> emissions)
         {
-            _emissionsRepository.UpdateEmissionData(emissions);
+            try
+            {
+                await _emissionsRepository.UpdateEmissionData(emissions);
 
-            _logger.LogDebug($"Received {emissions.Count} EmissionData elements");
+                _logger.LogDebug($"Received {emissions.Count} EmissionData elements");
 
-            return Ok();
+                return Ok();
+
+            }
+            catch (System.Exception ex)
+            {
+
+                _logger.LogError(ex, "Exception in EmissionsController.UpdateEmissions", null);
+            }
+            return null;
         }
     }
 }

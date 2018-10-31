@@ -2,7 +2,7 @@
 
 cd ./greenergy.api.server
 
-export DOCKER_TAG="sorbra/greenergy.api.server:0.0.1"
+export DOCKER_TAG="sorbra/greenergy.api.server:0.0.2"
 
 # Build the docker container and tag it.
 docker build -t $DOCKER_TAG .

@@ -1,4 +1,7 @@
 {
+    "Fulfillment": {
+        "TimeZone": "Europe/Copenhagen"
+    },
     "GreenergyAPI": {
         "Protocol": "http",
         "Host": "api-service",
