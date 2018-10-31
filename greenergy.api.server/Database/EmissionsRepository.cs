@@ -11,11 +11,11 @@ using System.Linq;
 
 namespace Greenergy.Database
 {
-    public class MongoEmissionsRepository : IEmissionsRepository
+    public class EmissionsRepository : IEmissionsRepository
     {
         private readonly EmissionDataContext _context = null;
 
-        public MongoEmissionsRepository(IOptions<MongoSettings> settings)
+        public EmissionsRepository(IOptions<MongoSettings> settings)
         {
             _context = new EmissionDataContext(settings);
         }
@@ -44,20 +44,6 @@ namespace Greenergy.Database
                 return await _context.EmissionsCollection
                         .Find(x => x.TimeStampUTC.CompareTo(noEarlierThan) >= 0)
                         .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
-
-
-        public async Task InsertEmissionData(List<EmissionData> emissions)
-        {
-            try
-            {
-                await _context.EmissionsCollection.InsertManyAsync(emissions);
             }
             catch (Exception ex)
             {
@@ -128,21 +114,6 @@ namespace Greenergy.Database
             catch (Exception ex)
             {
                 // log or manage the exception
-                throw ex;
-            }
-        }
-
-        public async Task<List<EmissionData>> GetEmissionData()
-        {
-            try
-            {
-                return await _context.EmissionsCollection
-                    .Find(_ => true)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-
                 throw ex;
             }
         }
