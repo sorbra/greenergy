@@ -21,6 +21,9 @@ namespace greenergy.chatbot_fulfillment.Controllers
         private const string _handleChargeCarYESIntent = "projects/greenergy-3dbfe/agent/intents/07a5c59b-1bdc-4dc5-8788-5380b48c5324";
         private const string _handleChargeCarNOIntent = "projects/greenergy-3dbfe/agent/intents/63256d8b-9a44-4dd3-829f-47dc8073bc8c";
         private const string _handleCurrentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
+        private const string _handleSendReminderIntent = "projects/greenergy-3dbfe/agent/intents/2f19e6a9-a5c9-404c-a4e0-4d34f90edeba";
+
+        private const string _drivesomewhereintentFollowupContext = "drivesomewhereintent-followup";
 
         private IGreenergyAPI _greenergyAPI;
         private ILogger<FulfillmentController> _logger;
@@ -66,8 +69,13 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 {
                     return await HandleCurrentCo2QueryIntent(request);
                 }
+                else if (intent.Equals(_handleSendReminderIntent))
+                {
+                    return await HandleSendReminderIntent(request);
+                }
                 else
                 {
+                    _logger.LogError($"FulfillmentController.Fulfill: Unknown intent: {request.queryResult.intent.displayName}");
                     return NotFound();
                 }
             }
@@ -76,6 +84,16 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 _logger.LogError(ex, "Exception in FulfillmentController.Fulfill", null);
                 return null;
             }
+        }
+
+        private async Task<ActionResult<DialogFlowResponseDTO>> HandleSendReminderIntent(DialogFlowRequestDTO request)
+        {
+            var response = new DialogFlowResponseDTO();
+            response.outputContexts = request.queryResult.outputContexts;
+
+            response.fulfillmentText = request.queryResult.fulfillmentText;
+
+            return response;
         }
 
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
@@ -96,41 +114,38 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleChargeCarIntent(DialogFlowRequestDTO request, Boolean doCharge)
         {
-            var driveSomewhereContext = request.queryResult.outputContexts[0];
-            var parameters = driveSomewhereContext.parameters;
+            var parameters = request.queryResult.outputContexts
+                                        .FirstOrDefault(oc => oc.name.EndsWith(_drivesomewhereintentFollowupContext))
+                                        .parameters;
 
             DateTime driveTime = parameters.time.ToUniversalTime();
             DateTime driveDate = parameters.time.Date;
 
             float hoursNeeded = parameters.kilometers / kilometersPerKwh / kwhPerHour;
 
-            // Retrieve the time zone for Copenhagen Denmark (Romance Standard Time).
-            TimeZoneInfo cet;
-            String tzName = _config.Value.TimeZone; // "Romance Standard Time"; // "Europe/Copenhagen"; 
+            DateTime chargeTime = new DateTime(driveDate.Year, driveDate.Month, driveDate.Day, driveTime.Hour, driveTime.Minute, driveTime.Second, DateTimeKind.Utc).AddHours(-hoursNeeded);
+
             try
             {
-                cet = TimeZoneInfo.FindSystemTimeZoneById(tzName);
-                driveTime = TimeZoneInfo.ConvertTime(driveTime, cet);
+                var cet = TimeZoneInfo.FindSystemTimeZoneById(_config.Value.TimeZone);
+                chargeTime = TimeZoneInfo.ConvertTime(chargeTime, cet);
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, $"HandleChargeCarIntent: Unable to retrieve the {tzName} Time zone.");
-                throw ex;
+                _logger.LogCritical(ex, ex.Message);
+                throw (ex);
             }
-
-            DateTime chargeTime = new DateTime(driveDate.Year, driveDate.Month, driveDate.Day, driveTime.Hour, driveTime.Minute, driveTime.Second).AddHours(-hoursNeeded);
 
             var response = new DialogFlowResponseDTO();
             response.outputContexts = request.queryResult.outputContexts;
 
             if (doCharge)
             {
-                response.fulfillmentText = $"I will charge your car. Please plug in your car no later than {chargeTime.DayOfWeek} at {chargeTime.ToShortTimeString()} to ensure timely charging.";
+                // do something to remember to charge the car
             }
-            else
-            {
-                response.fulfillmentText = $"Start charging no later than {chargeTime.DayOfWeek} at {chargeTime.ToShortTimeString()} to ensure timely charging.";
-            }
+            response.fulfillmentText = request.queryResult.fulfillmentText
+                            .Replace("$chargeDay", chargeTime.DayOfWeek.ToString())
+                            .Replace("$chargeTime", chargeTime.ToShortTimeString());
 
             return response;
         }
