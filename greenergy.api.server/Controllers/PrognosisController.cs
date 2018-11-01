@@ -35,23 +35,18 @@ namespace greenergy.api.server.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<PrognosisData>>> GetPrognosisMinimum()
+        [HttpGet("optimize")]
+        public async Task<ActionResult<ConsumptionInfo>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime finishNoLaterThan)
         {
             try
             {
-                var result = await _prognosisRepository.PrognosisMinimum();
-                if (result!=null)
-                {
-                    return result;
-                }
-                return new List<PrognosisData>();
+                return await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, finishNoLaterThan);
             }
             catch (System.Exception ex)
             {
-                _logger.LogError(ex, "Exception in PrognosisController.GetPrognosisMinimum", null);
+                _logger.LogError(ex, "Exception in PrognosisController.OptimalFutureConsumptionTime", null);
+                return null;
             }
-            return null;
         }
     }
 }

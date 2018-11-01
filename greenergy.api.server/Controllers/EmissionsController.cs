@@ -24,21 +24,18 @@ namespace greenergy.api.server.Controllers
             _emissionsRepository = emissionsRepository;
         }
 
-        [HttpGet("{when}")]
-        public async Task<ActionResult<List<EmissionData>>> GetMostRecentEmissions(string when)
+        [HttpGet("latest")]
+        public async Task<ActionResult<List<EmissionData>>> GetMostRecentEmissions()
         {
             try
             {
-                if (when.ToLower().Equals("latest"))
-                {
-                    return await _emissionsRepository.GetLatest();
-                }
+                return await _emissionsRepository.GetLatest();
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex, "Exception in EmissionsController.GetMostRecentEmissions", null);
+                return null;
             }
-            return null;
         }
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.

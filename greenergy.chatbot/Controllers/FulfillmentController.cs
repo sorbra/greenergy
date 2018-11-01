@@ -105,7 +105,10 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 var currentEmission = emissions[0].Emission;
 
                 DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-                response.fulfillmentText = $"Current co2 emission is {currentEmission} grams co2 per kilowatt hour";
+//                response.fulfillmentText = $"Current co2 emission is {currentEmission} grams co2 per kilowatt hour";
+
+                response.fulfillmentText = request.queryResult.fulfillmentText
+                            .Replace("$co2perkwh", currentEmission.ToString());
 
                 return response;
             }
