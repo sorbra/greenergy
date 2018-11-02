@@ -20,7 +20,7 @@ namespace Greenergy.Database
             _context = context;
         }
 
-        public async Task<IEnumerable<EmissionData>> GetRecentEmissionData(int hours)
+        public async Task<IEnumerable<EmissionDataMongo>> GetRecentEmissionData(int hours)
         {
             DateTime startTime = DateTime.Now.AddHours(-hours);
 
@@ -37,7 +37,7 @@ namespace Greenergy.Database
             }
         }
 
-        public async Task<List<EmissionData>> GetEmissionDataSince(DateTime noEarlierThan)
+        public async Task<List<EmissionDataMongo>> GetEmissionDataSince(DateTime noEarlierThan)
         {
             try
             {
@@ -52,13 +52,13 @@ namespace Greenergy.Database
             }
         }
 
-        public async Task UpdateEmissionData(List<EmissionData> emissions)
+        public async Task UpdateEmissionData(List<EmissionDataMongo> emissions)
         {
             foreach (var ed in emissions)
             {
-                var filter = Builders<EmissionData>.Filter.Eq(edx => edx.Region, ed.Region)
-                           & Builders<EmissionData>.Filter.Eq(edx => edx.TimeStampUTC, ed.TimeStampUTC);
-                var update = Builders<EmissionData>.Update
+                var filter = Builders<EmissionDataMongo>.Filter.Eq(edx => edx.Region, ed.Region)
+                           & Builders<EmissionDataMongo>.Filter.Eq(edx => edx.TimeStampUTC, ed.TimeStampUTC);
+                var update = Builders<EmissionDataMongo>.Update
                                 .Set(edx => edx.Emission, ed.Emission)
                                 .CurrentDate(edx => edx.CreatedOn);
                 var options = new UpdateOptions();
@@ -98,7 +98,7 @@ namespace Greenergy.Database
             }
         }
 
-        public async Task<List<EmissionData>> GetLatest()
+        public async Task<List<EmissionDataMongo>> GetLatest()
         {
             DateTime latestTime = await MostRecentEmissionDataTimeStamp();
             if (latestTime.CompareTo(DateTime.MinValue) == 0)

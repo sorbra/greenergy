@@ -18,19 +18,19 @@ namespace Greenergy.Database
             }
         }
 
-        public IMongoCollection<EmissionData> EmissionsCollection
+        public IMongoCollection<EmissionDataMongo> EmissionsCollection
         {
             get
             {
-                return _database.GetCollection<EmissionData>("Emissions");
+                return _database.GetCollection<EmissionDataMongo>("Emissions");
             }
         }
 
-        public IMongoCollection<PrognosisData> PrognosisCollection
+        public IMongoCollection<PrognosisDataMongo> PrognosisCollection
         {
             get
             {
-                return _database.GetCollection<PrognosisData>("Prognoses");
+                return _database.GetCollection<PrognosisDataMongo>("Prognoses");
             }
         }
     }

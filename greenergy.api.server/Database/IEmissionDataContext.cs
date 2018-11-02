@@ -5,8 +5,8 @@ namespace Greenergy.Database
 {
     public interface IEmissionDataContext
     {
-        IMongoCollection<EmissionData> EmissionsCollection { get; }
+        IMongoCollection<EmissionDataMongo> EmissionsCollection { get; }
 
-        IMongoCollection<PrognosisData> PrognosisCollection { get; }
+        IMongoCollection<PrognosisDataMongo> PrognosisCollection { get; }
     }
 }

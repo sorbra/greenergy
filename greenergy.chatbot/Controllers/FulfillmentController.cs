@@ -24,6 +24,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
         private const string _handleSendReminderIntent = "projects/greenergy-3dbfe/agent/intents/2f19e6a9-a5c9-404c-a4e0-4d34f90edeba";
 
         private const string _drivesomewhereintentFollowupContext = "drivesomewhereintent-followup";
+        private const string _consumeElectricityOutputContext = "consume-electricity-output-context";
 
         private IGreenergyAPI _greenergyAPI;
         private ILogger<FulfillmentController> _logger;
@@ -98,17 +99,26 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
         {
-            var emissions = await _greenergyAPI.GetMostRecentEmissions();
 
-            if (emissions != null)
+            Parameters parameters = request.queryResult.outputContexts
+                        .FirstOrDefault(oc => oc.name.EndsWith(_consumeElectricityOutputContext))
+                        .parameters;
+
+            var best = await _greenergyAPI.OptimalFutureConsumptionTime(
+                consumptionMinutes: parameters.duration.toMinutes(),
+                consumptionRegion: "DK1", 
+                startNoEarlierThan: DateTime.Now,
+                finishNoLaterThan: DateTime.MaxValue
+            );
+
+            if (best != null)
             {
-                var currentEmission = emissions[0].Emission;
-
                 DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-//                response.fulfillmentText = $"Current co2 emission is {currentEmission} grams co2 per kilowatt hour";
 
                 response.fulfillmentText = request.queryResult.fulfillmentText
-                            .Replace("$co2perkwh", currentEmission.ToString());
+                            .Replace("$co2perkwh", best.co2perkwh.ToString())
+                            .Replace("$optimal-time", best.consumptionStart.ToShortTimeString())
+                            .Replace("$optimal-day", best.consumptionStart.DayOfWeek.ToString());
 
                 return response;
             }

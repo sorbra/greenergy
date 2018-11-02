@@ -10,6 +10,9 @@ namespace Greenergy.API.Models
             this.TimeStampUTC = TimeStampUTC;
             this.Region = Region;
         }
+        public EmissionDataDTO()
+        {
+        }
 
         public int Emission { get; set; }
 

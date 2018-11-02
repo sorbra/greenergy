@@ -21,13 +21,13 @@ namespace Greenergy.Database
             _context = context;
         }
 
-        public async Task UpdatePrognosisData(List<PrognosisData> prognoses)
+        public async Task UpdatePrognosisData(List<PrognosisDataMongo> prognoses)
         {
             foreach (var pg in prognoses)
             {
-                var filter = Builders<PrognosisData>.Filter.Eq(pgx => pgx.Region, pg.Region)
-                           & Builders<PrognosisData>.Filter.Eq(pgx => pgx.TimeStampUTC, pg.TimeStampUTC);
-                var update = Builders<PrognosisData>.Update
+                var filter = Builders<PrognosisDataMongo>.Filter.Eq(pgx => pgx.Region, pg.Region)
+                           & Builders<PrognosisDataMongo>.Filter.Eq(pgx => pgx.TimeStampUTC, pg.TimeStampUTC);
+                var update = Builders<PrognosisDataMongo>.Update
                                 .Set(pgx => pgx.Emission, pg.Emission)
                                 .CurrentDate(pgx => pgx.CreatedOn);
                 var options = new UpdateOptions();
@@ -45,10 +45,13 @@ namespace Greenergy.Database
         }
 
 
-        public async Task<ConsumptionInfo> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime finishNoLaterThan)
+        public async Task<ConsumptionInfoMongo> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
         {
+            if (startNoEarlierThan == null) startNoEarlierThan = DateTime.Now;
+            if (finishNoLaterThan == null) finishNoLaterThan = DateTime.MaxValue;
+
             var prognoses = await _context.PrognosisCollection
-                    .Find(p => (p.TimeStampUTC.CompareTo(DateTime.Now) >= 0)
+                    .Find(p => (p.TimeStampUTC.CompareTo(startNoEarlierThan) >= 0)
                               && p.TimeStampUTC.CompareTo(finishNoLaterThan) < 0
                               && p.Region.Equals(consumptionRegion))
                     .SortBy(p => p.TimeStampUTC)
@@ -89,7 +92,7 @@ namespace Greenergy.Database
                 }
             }
 
-            return new ConsumptionInfo
+            return new ConsumptionInfoMongo
             {
                 co2perkwh = minTotalEmission / windowSize,
                 consumptionStart = prognoses[inxMinStart].TimeStampUTC,

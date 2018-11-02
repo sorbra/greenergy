@@ -115,6 +115,24 @@ namespace greenergy.chatbot_fulfillment.Models
         public DateTime date { get; set; }
         public DateTime time { get; set; }
         public float kilometers { get; set; }
+        public Duration duration { get; set; }
+    }
+
+    public class Duration
+    {
+        public int amount { get; set; }
+        public string unit { get; set; }
+
+        public int toMinutes()
+        {
+            if (unit.Equals("min"))
+                return amount;
+            else if (unit.Equals("h"))
+                return amount*60;
+            else if (unit.Equals("day"))
+                return amount*60*24;
+            return -1;
+        }
     }
 
     public class OutputContext

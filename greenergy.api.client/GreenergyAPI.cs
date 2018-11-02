@@ -51,7 +51,7 @@ namespace Greenergy.API
             }
             catch (System.Exception ex)
             {
-                _logger.LogCritical(ex,"GreenergyAPI.GetMostRecentEmissions",null);
+                _logger.LogCritical(ex, "GreenergyAPI.GetMostRecentEmissions", null);
             }
             return null;
         }
@@ -104,6 +104,26 @@ namespace Greenergy.API
                 {
                     throw new Exception($"Failed to save data: {apiResponse.StatusCode} - {apiResponse.ReasonPhrase}");
                 }
+            }
+        }
+        public async Task<ConsumptionInfoDTO> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
+        {
+            finishNoLaterThan = DateTime.Now.AddHours(12);
+
+            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/prognosis/optimize?consumptionMinutes={consumptionMinutes}&consumptionRegion={consumptionRegion}&startNoEarlierThan={startNoEarlierThan}&finishNoLaterThan={finishNoLaterThan.ToUniversalTime().ToString("o")}";
+
+            try
+            {
+                using (HttpClient client = NewClient())
+                {
+                    var responseString = await client.GetStringAsync(apiURL);
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<ConsumptionInfoDTO>(responseString);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogCritical(ex, "GreenergyAPI.OptimalFutureConsumptionTime", null);
+                return null;
             }
         }
     }

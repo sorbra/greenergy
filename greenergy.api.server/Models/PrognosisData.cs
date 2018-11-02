@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Greenergy.Models
 {
-    public class PrognosisData: EmissionData
+    public class PrognosisDataMongo: EmissionDataMongo
     {
-        public PrognosisData (int Emission, DateTime TimeStampUTC, string Region) 
+        public PrognosisDataMongo (int Emission, DateTime TimeStampUTC, string Region) 
                     : base (Emission, TimeStampUTC, Region)
         {
         }

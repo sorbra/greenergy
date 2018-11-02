@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Greenergy.API.Models;
 using Greenergy.Database;
 using Greenergy.Models;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +27,7 @@ namespace greenergy.api.server.Controllers
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
         [HttpPost]
-        public async Task<ActionResult> UpdatePrognoses([FromBody] List<PrognosisData> prognoses )
+        public async Task<ActionResult> UpdatePrognoses([FromBody] List<PrognosisDataMongo> prognoses )
         {
             await _prognosisRepository.UpdatePrognosisData(prognoses);
 
@@ -36,11 +37,12 @@ namespace greenergy.api.server.Controllers
         }
 
         [HttpGet("optimize")]
-        public async Task<ActionResult<ConsumptionInfo>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime finishNoLaterThan)
+        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEalierThan, DateTime finishNoLaterThan)
         {
             try
             {
-                return await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, finishNoLaterThan);
+                var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEalierThan, finishNoLaterThan);
+                return (ConsumptionInfoDTO) cim;
             }
             catch (System.Exception ex)
             {
