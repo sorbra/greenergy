@@ -18,9 +18,11 @@ namespace greenergy.chatbot_fulfillment.Controllers
         private const float kilometersPerKwh = 5f;
         private const float kwhPerHour = 10f;
 
-        private const string _handleChargeCarYESIntent = "projects/greenergy-3dbfe/agent/intents/07a5c59b-1bdc-4dc5-8788-5380b48c5324";
-        private const string _handleChargeCarNOIntent = "projects/greenergy-3dbfe/agent/intents/63256d8b-9a44-4dd3-829f-47dc8073bc8c";
-        private const string _handleCurrentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
+        private const string _chargeCarYESIntent = "projects/greenergy-3dbfe/agent/intents/07a5c59b-1bdc-4dc5-8788-5380b48c5324";
+        private const string _chargeCarNOIntent = "projects/greenergy-3dbfe/agent/intents/63256d8b-9a44-4dd3-829f-47dc8073bc8c";
+        private const string _consumeElectricityIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
+        private const string _currentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/460c430c-52a7-4313-8e23-20bb9e191bf0";
+
         private const string _handleSendReminderIntent = "projects/greenergy-3dbfe/agent/intents/2f19e6a9-a5c9-404c-a4e0-4d34f90edeba";
 
         private const string _drivesomewhereintentFollowupContext = "drivesomewhereintent-followup";
@@ -58,22 +60,24 @@ namespace greenergy.chatbot_fulfillment.Controllers
             try
             {
                 var intent = request.queryResult.intent.name;
-                if (intent.Equals(_handleChargeCarYESIntent))
+                if (intent.Equals(_chargeCarYESIntent))
                 {
                     return await HandleChargeCarIntent(request, true);
                 }
-                else if (intent.Equals(_handleChargeCarNOIntent))
+                else if (intent.Equals(_chargeCarNOIntent))
                 {
                     return await HandleChargeCarIntent(request, false);
                 }
-                else if (intent.Equals(_handleCurrentCo2QueryIntent))
+                else if (intent.Equals(_consumeElectricityIntent))
                 {
-                    return await HandleCurrentCo2QueryIntent(request);
+                    return await HandleConsumeElectricityIntent(request);
                 }
                 else if (intent.Equals(_handleSendReminderIntent))
                 {
                     return await HandleSendReminderIntent(request);
                 }
+                else if (intent.Equals(_currentCo2QueryIntent))
+                    return await HandleCurrentCo2QueryIntent(request);
                 else
                 {
                     _logger.LogError($"FulfillmentController.Fulfill: Unknown intent: {request.queryResult.intent.displayName}");
@@ -87,6 +91,16 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
         }
 
+        private async Task<ActionResult<DialogFlowResponseDTO>> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
+        {
+            var currentEmission = (await _greenergyAPI.GetMostRecentEmissions())[0].Emission;
+
+            DialogFlowResponseDTO response = new DialogFlowResponseDTO();
+
+            response.fulfillmentText = request.queryResult.fulfillmentText.Replace("$co2perkwh", currentEmission.ToString());
+            return response;
+        }
+
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleSendReminderIntent(DialogFlowRequestDTO request)
         {
             var response = new DialogFlowResponseDTO();
@@ -97,9 +111,8 @@ namespace greenergy.chatbot_fulfillment.Controllers
             return response;
         }
 
-        private async Task<ActionResult<DialogFlowResponseDTO>> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
+        private async Task<ActionResult<DialogFlowResponseDTO>> HandleConsumeElectricityIntent(DialogFlowRequestDTO request)
         {
-
             Parameters parameters = request.queryResult.outputContexts
                         .FirstOrDefault(oc => oc.name.EndsWith(_consumeElectricityOutputContext))
                         .parameters;
@@ -118,8 +131,8 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 response.fulfillmentText = request.queryResult.fulfillmentText
                             .Replace("$co2perkwh", best.co2perkwh.ToString())
                             .Replace("$optimal-time", best.consumptionStart.ToShortTimeString())
-                            .Replace("$optimal-day", best.consumptionStart.DayOfWeek.ToString());
-
+                            .Replace("$optimal-day", best.consumptionStart.DayOfWeek.ToString())
+                            .Replace("$waiting-time", (Math.Round((decimal) (best.consumptionStart - DateTime.Now).TotalHours,0)).ToString());
                 return response;
             }
             return null;

@@ -37,11 +37,11 @@ namespace greenergy.api.server.Controllers
         }
 
         [HttpGet("optimize")]
-        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEalierThan, DateTime finishNoLaterThan)
+        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
         {
             try
             {
-                var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEalierThan, finishNoLaterThan);
+                var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
                 return (ConsumptionInfoDTO) cim;
             }
             catch (System.Exception ex)

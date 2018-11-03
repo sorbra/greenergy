@@ -120,17 +120,17 @@ namespace greenergy.chatbot_fulfillment.Models
 
     public class Duration
     {
-        public int amount { get; set; }
+        public float amount { get; set; }
         public string unit { get; set; }
 
         public int toMinutes()
         {
             if (unit.Equals("min"))
-                return amount;
+                return (int) amount;
             else if (unit.Equals("h"))
-                return amount*60;
+                return (int) amount*60;
             else if (unit.Equals("day"))
-                return amount*60*24;
+                return (int) amount*60*24;
             return -1;
         }
     }

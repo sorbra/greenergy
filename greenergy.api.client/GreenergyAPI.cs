@@ -108,9 +108,7 @@ namespace Greenergy.API
         }
         public async Task<ConsumptionInfoDTO> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
         {
-            finishNoLaterThan = DateTime.Now.AddHours(12);
-
-            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/prognosis/optimize?consumptionMinutes={consumptionMinutes}&consumptionRegion={consumptionRegion}&startNoEarlierThan={startNoEarlierThan}&finishNoLaterThan={finishNoLaterThan.ToUniversalTime().ToString("o")}";
+            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/prognosis/optimize?consumptionMinutes={consumptionMinutes}&consumptionRegion={consumptionRegion}&startNoEarlierThan={startNoEarlierThan.ToUniversalTime().ToString("o")}&finishNoLaterThan={finishNoLaterThan.ToUniversalTime().ToString("o")}";
 
             try
             {
