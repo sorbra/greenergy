@@ -120,7 +120,7 @@ namespace Greenergy.API
             }
             catch (System.Exception ex)
             {
-                _logger.LogCritical(ex, "GreenergyAPI.OptimalFutureConsumptionTime", null);
+                _logger.LogCritical(ex, ex.Message, null);
                 return null;
             }
         }

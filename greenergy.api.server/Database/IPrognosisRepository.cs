@@ -25,7 +25,7 @@ namespace Greenergy.Database
         {
             return new ConsumptionInfoDTO
             {
-                co2perkwh = cim.co2perkwh,
+                optimalCo2perkwh = cim.co2perkwh,
                 consumptionStart = cim.consumptionStart,
                 consumptionMinutes = cim.consumptionMinutes,
                 consumptionRegion = cim.consumptionRegion,

@@ -18,11 +18,13 @@ namespace greenergy.api.server.Controllers
     {
         private ILogger<PrognosisController> _logger;
         private IPrognosisRepository _prognosisRepository;
+        private IEmissionsRepository _emissionsRepository;
 
-        public PrognosisController (ILogger<PrognosisController> logger, IPrognosisRepository prognosisRepository)
+        public PrognosisController (ILogger<PrognosisController> logger, IPrognosisRepository prognosisRepository, IEmissionsRepository emissionsRepository)
         {
             _logger = logger;
             _prognosisRepository = prognosisRepository;
+            _emissionsRepository = emissionsRepository;
         }
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
@@ -42,7 +44,11 @@ namespace greenergy.api.server.Controllers
             try
             {
                 var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
-                return (ConsumptionInfoDTO) cim;
+
+                var ci = (ConsumptionInfoDTO) cim;
+                ci.currentCo2perkwh = (await _emissionsRepository.GetLatest()).Find(p => p.Region == consumptionRegion).Emission;
+
+                return ci;
             }
             catch (System.Exception ex)
             {

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name:  greenergy-syncdata-energinetdk
-        image: sorbra/greenergy.syncdata.energinetdk:0.0.3
+        image: sorbra/greenergy.syncdata.energinetdk:0.1.0
         imagePullPolicy: Always
         volumeMounts: 
         - name: "appsettings"
