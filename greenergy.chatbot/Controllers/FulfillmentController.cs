@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Greenergy.API.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace greenergy.chatbot_fulfillment.Controllers
 {
@@ -18,13 +19,6 @@ namespace greenergy.chatbot_fulfillment.Controllers
     {
         private const float kilometersPerKwh = 5f;
         private const float kwhPerHour = 10f;
-        private const string ChargeCarYESIntent = "projects/greenergy-3dbfe/agent/intents/07a5c59b-1bdc-4dc5-8788-5380b48c5324";
-        private const string ChargeCarNOIntent = "projects/greenergy-3dbfe/agent/intents/63256d8b-9a44-4dd3-829f-47dc8073bc8c";
-        private const string ConsumeElectricityIntent = "projects/greenergy-3dbfe/agent/intents/6e9a8963-9a74-4343-8e0d-a7b2563db55c";
-        private const string CurrentCo2QueryIntent = "projects/greenergy-3dbfe/agent/intents/460c430c-52a7-4313-8e23-20bb9e191bf0";
-        private const string SendReminderIntent = "projects/greenergy-3dbfe/agent/intents/2f19e6a9-a5c9-404c-a4e0-4d34f90edeba";
-        private const string DrivesomewhereintentFollowupContext = "drivesomewhereintent-followup";
-        private const string ConsumeElectricityOutputContext = "consume-electricity-output-context";
 
         private IGreenergyAPI _greenergyAPI;
         private ILogger<FulfillmentController> _logger;
@@ -68,35 +62,67 @@ namespace greenergy.chatbot_fulfillment.Controllers
         {
             try
             {
-                var intent = request.queryResult.intent.name;
-                if (intent.Equals(ChargeCarYESIntent))
+//                var intent = request.queryResult.intent.name;
+                var action = request.queryResult.action;
+                if (action.Equals("chargecar.intent.yes"))
                 {
                     return await HandleChargeCarIntent(request, true);
                 }
-                else if (intent.Equals(ChargeCarNOIntent))
+                else if (action.Equals("chargecar.intent.no"))
                 {
                     return await HandleChargeCarIntent(request, false);
                 }
-                else if (intent.Equals(ConsumeElectricityIntent))
+                else if (action.Equals("consume.electricity"))
                 {
                     return await HandleConsumeElectricityIntent(request);
                 }
-                else if (intent.Equals(SendReminderIntent))
+                else if (action.Equals("send.charging.reminder.yes"))
                 {
                     return await HandleSendReminderIntent(request);
                 }
-                else if (intent.Equals(CurrentCo2QueryIntent))
+                else if (action.Equals("request.currentemissions"))
+                {
                     return await HandleCurrentCo2QueryIntent(request);
+                }
+                else if (action.Equals("consume.electricity.explain"))
+                {
+                    return await HandleConsumeElectricityExplain(request);
+                }
                 else
                 {
-                    _logger.LogError($"FulfillmentController.Fulfill: Unknown intent: {request.queryResult.intent.displayName}");
+                    _logger.LogError($"FulfillmentController.Fulfill: Unknown action: {action}");
                     return NotFound();
                 }
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex, "Exception in FulfillmentController.Fulfill", null);
-                return null;
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        private async Task<ActionResult<DialogFlowResponseDTO>> HandleConsumeElectricityExplain(DialogFlowRequestDTO request)
+        {
+            try
+            {
+                Parameters parameters = request.queryResult.outputContexts
+                            .FirstOrDefault(oc => oc.name.EndsWith("consumeelectricity-followup"))
+                            .parameters;
+
+                DialogFlowResponseDTO response = new DialogFlowResponseDTO();
+                response.outputContexts = request.queryResult.outputContexts;
+                var co2perkwh = parameters.currentemissions;
+
+                response.fulfillmentText = request.queryResult.fulfillmentText
+                            .Replace("$currentemissions", parameters.currentemissions.ToString())
+                            .Replace("$optimalemissions", parameters.optimalemissions.ToString())
+                            .Replace("$savingspercentage", parameters.savingspercentage.ToString());
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -139,7 +165,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
             try
             {
                 Parameters parameters = request.queryResult.outputContexts
-                            .FirstOrDefault(oc => oc.name.EndsWith(ConsumeElectricityOutputContext))
+                            .FirstOrDefault(oc => oc.name.EndsWith("consume-electricity-output-context"))
                             .parameters;
 
                 var best = await _greenergyAPI.OptimalFutureConsumptionTime(
@@ -152,15 +178,32 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 if (best != null)
                 {
                     DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-                    var consumptionStart = TimeZoneInfo.ConvertTime(best.consumptionStart, _copenhagenTimeZoneInfo);
-    
-                    int savingsPercentage = (best.optimalCo2perkwh - best.currentCo2perkwh) / best.currentCo2perkwh;
+                    response.outputContexts = request.queryResult.outputContexts;
+
+                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.optimalConsumptionStart, _copenhagenTimeZoneInfo);
+                    var prognosisEnd = TimeZoneInfo.ConvertTime(best.lastPrognosisTime, _copenhagenTimeZoneInfo).AddMinutes(5);
+                    var now = TimeZoneInfo.ConvertTime(DateTime.Now, _copenhagenTimeZoneInfo);
+                    var prognosisLookaheadHours = Math.Round((prognosisEnd - now).TotalHours, 0);
+
+                    var lang = request.queryResult.languageCode;
+                    var culture = CultureInfo.CreateSpecificCulture(lang);
+
+                    float savingsPercentage = (best.currentEmissions - best.optimalEmissions) / best.currentEmissions;
+
+                    OutputContext ctx = response.outputContexts
+                                        .Find(oc => oc.name.EndsWith("consumeelectricity-followup"));
+                    ctx.parameters.prognosisend = prognosisEnd;
+                    ctx.parameters.savingspercentage = (float)Math.Round(savingsPercentage * 100, 0);
+                    ctx.parameters.optimalemissions = best.optimalEmissions;
+                    ctx.parameters.currentemissions = best.currentEmissions;
+                    ctx.parameters.optimalconsumptionstart = optimalConsumptionStart.ToString("dddd HH:mm", culture);
 
                     response.fulfillmentText = request.queryResult.fulfillmentText
-                                .Replace("$co2perkwh", best.optimalCo2perkwh.ToString())
-                                .Replace("$optimal-time", consumptionStart.ToShortTimeString())
-                                .Replace("$optimal-day", consumptionStart.DayOfWeek.ToString())
-                                .Replace("$savings-percentage", savingsPercentage.ToString());
+                                .Replace("$optimalEmissions", best.optimalEmissions.ToString())
+                                .Replace("$consumption-start", optimalConsumptionStart.ToString("dddd HH:mm", culture))
+                                .Replace("$prognosis-end", prognosisEnd.ToString("dddd HH:mm", culture))
+                                .Replace("$savingspercentage", ctx.parameters.savingspercentage.ToString())
+                                .Replace("$prognosislookaheadhours", prognosisLookaheadHours.ToString() + " hours");
                     return response;
                 }
                 else
@@ -182,7 +225,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
             try
             {
                 var parameters = request.queryResult.outputContexts
-                                        .FirstOrDefault(oc => oc.name.EndsWith(DrivesomewhereintentFollowupContext))
+                                        .FirstOrDefault(oc => oc.name.EndsWith("drivesomewhereintent-followup"))
                                         .parameters;
 
                 DateTime driveTime = parameters.time.ToUniversalTime();

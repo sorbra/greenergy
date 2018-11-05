@@ -94,11 +94,13 @@ namespace Greenergy.Database
 
             return new ConsumptionInfoMongo
             {
-                co2perkwh = minTotalEmission / windowSize,
-                consumptionStart = prognoses[inxMinStart].TimeStampUTC,
+                optimalEmissions = minTotalEmission / windowSize,
+                currentEmissions = prognoses[0].Emission,
+                optimalConsumptionStart = prognoses[inxMinStart].TimeStampUTC,
                 consumptionMinutes = consumptionMinutes,
                 consumptionRegion = consumptionRegion,
-                lastPrognosisUpdateTime = prognoses[0].CreatedOn
+                prognosisUpdateTime = prognoses[0].CreatedOn,
+                lastPrognosisTime = prognoses.Last().TimeStampUTC
             };
         }
     }

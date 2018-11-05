@@ -4,7 +4,7 @@ export PODNAME=$1
 
 export API_POD=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep $PODNAME)
 
-echo Deleting pod $API_POD...
+#echo Deleting pod $API_POD...
 
 kubectl delete pod $API_POD
 # kubectl get pods

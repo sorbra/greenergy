@@ -44,11 +44,9 @@ namespace greenergy.api.server.Controllers
             try
             {
                 var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
-
                 var ci = (ConsumptionInfoDTO) cim;
-                ci.currentCo2perkwh = (await _emissionsRepository.GetLatest()).Find(p => p.Region == consumptionRegion).Emission;
-
                 return ci;
+                // ci.currentCo2perkwh = (await _emissionsRepository.GetLatest()).Find(p => p.Region == consumptionRegion).Emission;
             }
             catch (System.Exception ex)
             {

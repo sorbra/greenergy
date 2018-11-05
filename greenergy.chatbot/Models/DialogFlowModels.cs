@@ -24,6 +24,7 @@ namespace greenergy.chatbot_fulfillment.Models
     public class QueryResult
     {
         public string queryText { get; set; }
+        public string action { get; set; }
         public Parameters parameters { get; set; }
         public bool allRequiredParamsPresent { get; set; }
         public string fulfillmentText { get; set; }
@@ -112,10 +113,16 @@ namespace greenergy.chatbot_fulfillment.Models
 
     public class Parameters
     {
+
         public DateTime date { get; set; }
         public DateTime time { get; set; }
         public float kilometers { get; set; }
         public Duration duration { get; set; }
+        public DateTime prognosisend { get; set; }
+        public float savingspercentage { get; set; }
+        public float currentemissions  { get; set; }
+        public float optimalemissions  { get; set; }
+        public string optimalconsumptionstart;        
     }
 
     public class Duration

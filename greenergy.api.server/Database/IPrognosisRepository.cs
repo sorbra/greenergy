@@ -15,21 +15,25 @@ namespace Greenergy.Database
 
     public class ConsumptionInfoMongo
     {
-        public int co2perkwh { get; set; }
-        public DateTime consumptionStart { get; set; }
+        public float optimalEmissions { get; set; }
+        public float currentEmissions { get; set; }
+        public DateTime optimalConsumptionStart { get; set; }
         public int consumptionMinutes { get; set; }
         public string consumptionRegion { get; set; }
-        public DateTime lastPrognosisUpdateTime { get; set; }
+        public DateTime prognosisUpdateTime { get; set; }
+        public DateTime lastPrognosisTime { get; set; }
 
         public static explicit operator ConsumptionInfoDTO(ConsumptionInfoMongo cim)
         {
             return new ConsumptionInfoDTO
             {
-                optimalCo2perkwh = cim.co2perkwh,
-                consumptionStart = cim.consumptionStart,
+                currentEmissions = cim.currentEmissions,
+                optimalEmissions = cim.optimalEmissions,
+                optimalConsumptionStart = cim.optimalConsumptionStart,
                 consumptionMinutes = cim.consumptionMinutes,
                 consumptionRegion = cim.consumptionRegion,
-                lastPrognosisUpdateTime = cim.lastPrognosisUpdateTime
+                prognosisUpdateTime = cim.prognosisUpdateTime,
+                lastPrognosisTime = cim.lastPrognosisTime
             };
         }
     }
