@@ -1,0 +1,114 @@
+[
+  {
+    "id": "ec627523-e1cb-4cf7-9cd0-8d2024ee1405",
+    "data": [
+      {
+        "text": "run my dishwasher for ",
+        "userDefined": false
+      },
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541288509
+  },
+  {
+    "id": "b6c811b1-282f-4d9b-aa97-73080cafc7ef",
+    "data": [
+      {
+        "text": "I need to run my dishwasher for ",
+        "userDefined": false
+      },
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541288509
+  },
+  {
+    "id": "b2202b15-06ef-4c31-a90a-5b2e3462f5ed",
+    "data": [
+      {
+        "text": "can I have ",
+        "userDefined": false
+      },
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      },
+      {
+        "text": " electricity please?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  },
+  {
+    "id": "1fc4826f-64ca-4d0c-b975-a92bce1f2a0c",
+    "data": [
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      },
+      {
+        "text": " electricity please",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  },
+  {
+    "id": "d8e55d62-70a2-472d-80d5-35b24cd95223",
+    "data": [
+      {
+        "text": "When can I use power next?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  },
+  {
+    "id": "f431b62e-737d-4804-b3c3-9f55c03638d4",
+    "data": [
+      {
+        "text": "when can I run my dishwasher?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  },
+  {
+    "id": "ee302c45-3c11-48cc-b125-df873d3c52d0",
+    "data": [
+      {
+        "text": "when can I use electricity?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  }
+]

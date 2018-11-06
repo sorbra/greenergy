@@ -12,13 +12,13 @@
       "messages": [
         {
           "type": 0,
+          "lang": "en-gb",
+          "speech": "Hi there! I am your friendly climate coach. If you live in Denmark, you may ask me when to run your dishwasher, charge your car, and consume electricity wisely."
+        },
+        {
+          "type": 0,
           "lang": "en",
-          "speech": [
-            "Hi! How are you doing?",
-            "Hello! How can I help you?",
-            "Good day! What can I do for you today?",
-            "Greetings! How can I assist?"
-          ]
+          "speech": "Hi there! I am your friendly climate coach. If you live in Denmark, you may ask me when to run your dishwasher, charge your car, and consume electricity wisely."
         }
       ],
       "defaultResponsePlatforms": {},
@@ -28,6 +28,7 @@
   "priority": 500000,
   "webhookUsed": false,
   "webhookForSlotFilling": false,
+  "lastUpdate": 1541430977,
   "fallbackIntent": false,
   "events": [
     {

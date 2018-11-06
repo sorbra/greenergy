@@ -1,0 +1,46 @@
+{
+  "id": "460c430c-52a7-4313-8e23-20bb9e191bf0",
+  "name": "Current Co2",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "request.currentemissions",
+      "affectedContexts": [
+        {
+          "name": "CurrentCo2-followup",
+          "parameters": {},
+          "lifespan": 2
+        }
+      ],
+      "parameters": [],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": [
+            "Current carbon emissions are $co2perkwh grams per kilowatt hour.",
+            "$co2perkwh grams per kilowatt hour."
+          ]
+        },
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": [
+            "Current carbon emissions are $co2perkwh grams per kilowatt hour.",
+            "$co2perkwh grams per kilowatt hour."
+          ]
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1541430815,
+  "fallbackIntent": false,
+  "events": []
+}

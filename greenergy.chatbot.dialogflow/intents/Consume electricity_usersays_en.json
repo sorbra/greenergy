@@ -1,0 +1,222 @@
+[
+  {
+    "id": "5c429431-d423-40ee-8fc6-effaeca0de2f",
+    "data": [
+      {
+        "text": "when should I charge my ",
+        "userDefined": false
+      },
+      {
+        "text": "car",
+        "alias": "devicetype",
+        "meta": "@devicetype",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541541297
+  },
+  {
+    "id": "87ad31d8-218e-4524-868c-de52a48c82f6",
+    "data": [
+      {
+        "text": "running ",
+        "userDefined": false
+      },
+      {
+        "text": "dishwasher",
+        "alias": "devicetype",
+        "meta": "@devicetype",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541539018
+  },
+  {
+    "id": "6ccd0b2e-5899-4387-94d6-13b0868be4af",
+    "data": [
+      {
+        "text": "run ",
+        "userDefined": false
+      },
+      {
+        "text": "dishwasher",
+        "alias": "devicetype",
+        "meta": "@devicetype",
+        "userDefined": true
+      },
+      {
+        "text": " before ",
+        "userDefined": false
+      },
+      {
+        "text": "tomorrow",
+        "alias": "date",
+        "meta": "@sys.date",
+        "userDefined": false
+      },
+      {
+        "text": " ",
+        "userDefined": false
+      },
+      {
+        "text": "at 6 am",
+        "alias": "time",
+        "meta": "@sys.time",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541524769
+  },
+  {
+    "id": "a708ea87-3e16-41d6-b806-1d3c83f1aa16",
+    "data": [
+      {
+        "text": "run my ",
+        "userDefined": false
+      },
+      {
+        "text": "dishwasher",
+        "alias": "devicetype",
+        "meta": "@devicetype",
+        "userDefined": true
+      },
+      {
+        "text": " for ",
+        "userDefined": false
+      },
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541524769
+  },
+  {
+    "id": "6b213258-923b-4b06-9bb7-c3f9dc15899c",
+    "data": [
+      {
+        "text": "I need to run my ",
+        "userDefined": false
+      },
+      {
+        "text": "dishwasher",
+        "alias": "devicetype",
+        "meta": "@devicetype",
+        "userDefined": true
+      },
+      {
+        "text": " for ",
+        "userDefined": false
+      },
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541524454
+  },
+  {
+    "id": "c263d066-c1e1-4d9d-9781-e4b0d66ce131",
+    "data": [
+      {
+        "text": "can I have ",
+        "userDefined": false
+      },
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      },
+      {
+        "text": " electricity please?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  },
+  {
+    "id": "49d4916c-1d2f-4b96-b250-6f714c6c9a31",
+    "data": [
+      {
+        "text": "2 hours",
+        "alias": "duration",
+        "meta": "@sys.duration",
+        "userDefined": false
+      },
+      {
+        "text": " electricity please",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  },
+  {
+    "id": "9537fdde-59fc-4ba2-a579-f7db47f656df",
+    "data": [
+      {
+        "text": "When should I use power next?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541524769
+  },
+  {
+    "id": "36bd0947-614e-4438-8d3c-2a07f48e35a9",
+    "data": [
+      {
+        "text": "when can I run my ",
+        "userDefined": false
+      },
+      {
+        "text": "dishwasher",
+        "alias": "devicetype",
+        "meta": "@devicetype",
+        "userDefined": true
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541524454
+  },
+  {
+    "id": "e821d82e-a53b-4c24-b4d2-7bf853b7481b",
+    "data": [
+      {
+        "text": "when can I use electricity?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1541087707
+  }
+]

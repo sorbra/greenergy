@@ -1,0 +1,111 @@
+{
+  "id": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
+  "name": "Consume electricity",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "consume.electricity",
+      "affectedContexts": [
+        {
+          "name": "consume-electricity-output-context",
+          "parameters": {},
+          "lifespan": 1
+        },
+        {
+          "name": "Consumeelectricity-followup",
+          "parameters": {},
+          "lifespan": 2
+        }
+      ],
+      "parameters": [
+        {
+          "id": "a7820d13-cb06-47a4-a5f8-245456761112",
+          "required": false,
+          "dataType": "@sys.duration",
+          "name": "duration",
+          "value": "$duration",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "How long do you need to use electricity?"
+            },
+            {
+              "lang": "en",
+              "value": "For how long?"
+            },
+            {
+              "lang": "en-gb",
+              "value": "How long do you need to use electricity?"
+            },
+            {
+              "lang": "en-gb",
+              "value": "For how long?"
+            }
+          ],
+          "defaultValue": "",
+          "isList": false
+        },
+        {
+          "id": "a6958f76-6ba4-4b67-a7b6-198c85a69eb3",
+          "required": false,
+          "dataType": "@sys.date",
+          "name": "date",
+          "value": "$date",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "Date?"
+            }
+          ],
+          "defaultValue": "0001-01-01T00:00:00.0000000Z",
+          "isList": false
+        },
+        {
+          "id": "cb2259d6-311f-4b3b-8e71-f5121aa8ccce",
+          "required": false,
+          "dataType": "@sys.time",
+          "name": "time",
+          "value": "$time",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "Time?"
+            }
+          ],
+          "defaultValue": "0001-01-01T00:00:00.0000000Z",
+          "isList": false
+        },
+        {
+          "id": "fa79771d-53fe-4501-b1f6-16b04f597a69",
+          "required": false,
+          "dataType": "@devicetype",
+          "name": "devicetype",
+          "value": "$devicetype",
+          "isList": false
+        }
+      ],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": "Wait $waitinghours hours to achieve #consumeelectricity-followup.savingspercentage percent lower carbon emissions compared to now. $consumption-start is the best $readableduration to use electricity between now and $finishnolaterthan."
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": "$consumption-start is the best $duration.original to use electricity in the $prognosislookaheadhours between now and $prognosis-end."
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1541542009,
+  "fallbackIntent": false,
+  "events": []
+}

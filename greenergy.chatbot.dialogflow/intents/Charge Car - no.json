@@ -10,14 +10,30 @@
   "responses": [
     {
       "resetContexts": false,
-      "action": "DriveSomewhereIntent.DriveSomewhereIntent-no",
-      "affectedContexts": [],
+      "action": "chargecar.intent.no",
+      "affectedContexts": [
+        {
+          "name": "ChargeCar-yes-followup",
+          "parameters": {},
+          "lifespan": 2
+        },
+        {
+          "name": "ChargeCar-yes-followup-2",
+          "parameters": {},
+          "lifespan": 2
+        }
+      ],
       "parameters": [],
       "messages": [
         {
           "type": 0,
           "lang": "en",
-          "speech": []
+          "speech": "I will not charge your car. If you would like to know the best time to charge, you can ask me when to charge your car."
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": "Start charging no later than $chargeDay at $chargeTime to ensure timely charging. Would you like a reminder?"
         }
       ],
       "defaultResponsePlatforms": {},
@@ -27,7 +43,7 @@
   "priority": 500000,
   "webhookUsed": true,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1540547731,
+  "lastUpdate": 1541541195,
   "fallbackIntent": false,
   "events": []
 }

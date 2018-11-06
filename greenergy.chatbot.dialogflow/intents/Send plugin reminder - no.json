@@ -1,0 +1,45 @@
+{
+  "id": "94ba5354-b3ef-412b-bda0-d7af36023cc0",
+  "parentId": "07a5c59b-1bdc-4dc5-8788-5380b48c5324",
+  "rootParentId": "5845fca2-2532-4aca-ab69-d89947557032",
+  "name": "Send plugin reminder - no",
+  "auto": true,
+  "contexts": [
+    "ChargeCar-yes-followup",
+    "ChargeCar-yes-followup-2"
+  ],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "DriveSomewhereIntent.DriveSomewhereIntent-yes.ChargeCar-yes-no",
+      "affectedContexts": [],
+      "parameters": [],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": [
+            "Ok. Have a nice drive #drivesomewhereintent-followup.date.original at #drivesomewhereintent-followup.time.original.",
+            "Allright then. Drive carefully."
+          ]
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": [
+            "Ok. You\u0027re on your own.",
+            "Allright then. Good luck!!"
+          ]
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": false,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1541540918,
+  "fallbackIntent": false,
+  "events": []
+}

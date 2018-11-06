@@ -1,0 +1,39 @@
+{
+  "id": "10213103-0db4-4ba1-a403-7fcaab8a6722",
+  "parentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
+  "rootParentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
+  "name": "Consume electricity - explain",
+  "auto": true,
+  "contexts": [
+    "consume-electricity-output-context",
+    "Consumeelectricity-followup"
+  ],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "consume.electricity.explain",
+      "affectedContexts": [],
+      "parameters": [],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": "According to my prognosis data, using electricity at #Consumeelectricity-followup.optimalconsumptionstart will generate #Consumeelectricity-followup.optimalemissions  grams of carbon-dioxide per kilowatt hour, compared to #Consumeelectricity-followup.currentemissions grams now. This corresponds to #Consumeelectricity-followup.savingspercentage percent carbon dioxide savings."
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": "According to my prognosis data, using electricity later will generate $optimalemissions  grams of carbon-dioxide per kilowatt hour, compared to $currentemissions grams now. This corresponds to $savingspercentage percent carbon dioxide savings. Is there anything else I can do for you?"
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": false,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1541538839,
+  "fallbackIntent": false,
+  "events": []
+}

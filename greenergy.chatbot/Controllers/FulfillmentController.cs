@@ -62,7 +62,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
         {
             try
             {
-//                var intent = request.queryResult.intent.name;
+                //                var intent = request.queryResult.intent.name;
                 var action = request.queryResult.action;
                 if (action.Equals("chargecar.intent.yes"))
                 {
@@ -168,11 +168,40 @@ namespace greenergy.chatbot_fulfillment.Controllers
                             .FirstOrDefault(oc => oc.name.EndsWith("consume-electricity-output-context"))
                             .parameters;
 
+                var now = TimeZoneInfo.ConvertTime(DateTime.Now, _copenhagenTimeZoneInfo);
+
+                DateTime finishNoLaterThan;
+
+                if (parameters.time != DateTime.MinValue && parameters.date != DateTime.MinValue)
+                {
+                    DateTime byTime = parameters.time.ToUniversalTime();
+                    DateTime byDate = parameters.time.Date;
+                    finishNoLaterThan = new DateTime(byDate.Year, byDate.Month, byDate.Day, byTime.Hour, byTime.Minute, byTime.Second, DateTimeKind.Utc);
+                    finishNoLaterThan = TimeZoneInfo.ConvertTime(finishNoLaterThan, _copenhagenTimeZoneInfo);
+                }
+                else
+                {
+                    finishNoLaterThan = now.AddDays(1).Date.AddHours(6);
+                    if ((finishNoLaterThan - now).TotalHours < 6) finishNoLaterThan = finishNoLaterThan.AddDays(1);
+                }
+
+                if (parameters.duration == null)
+                {
+                    if (parameters.devicetype != null)
+                    {
+                        parameters.duration = LookupDefaultDeviceDuration(parameters.devicetype);
+                    }
+                    else
+                    {
+                        parameters.duration = new Duration { amount = 1, unit = "h" };
+                    }
+                }
+
                 var best = await _greenergyAPI.OptimalFutureConsumptionTime(
                     consumptionMinutes: parameters.duration.toMinutes(),
                     consumptionRegion: "DK1",
                     startNoEarlierThan: DateTime.Now,
-                    finishNoLaterThan: DateTime.MaxValue
+                    finishNoLaterThan: finishNoLaterThan
                 );
 
                 if (best != null)
@@ -182,7 +211,6 @@ namespace greenergy.chatbot_fulfillment.Controllers
 
                     var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.optimalConsumptionStart, _copenhagenTimeZoneInfo);
                     var prognosisEnd = TimeZoneInfo.ConvertTime(best.lastPrognosisTime, _copenhagenTimeZoneInfo).AddMinutes(5);
-                    var now = TimeZoneInfo.ConvertTime(DateTime.Now, _copenhagenTimeZoneInfo);
                     var prognosisLookaheadHours = Math.Round((prognosisEnd - now).TotalHours, 0);
 
                     var lang = request.queryResult.languageCode;
@@ -197,13 +225,21 @@ namespace greenergy.chatbot_fulfillment.Controllers
                     ctx.parameters.optimalemissions = best.optimalEmissions;
                     ctx.parameters.currentemissions = best.currentEmissions;
                     ctx.parameters.optimalconsumptionstart = optimalConsumptionStart.ToString("dddd HH:mm", culture);
+                    ctx.parameters.finishnolaterthan = finishNoLaterThan.ToString("dddd HH:mm", culture);
+                    ctx.parameters.duration = parameters.duration;
+                    ctx.parameters.readableduration = parameters.duration.toReadableString();
+                    ctx.parameters.waitinghours = Math.Round((optimalConsumptionStart - now).TotalHours,0);
 
                     response.fulfillmentText = request.queryResult.fulfillmentText
                                 .Replace("$optimalEmissions", best.optimalEmissions.ToString())
                                 .Replace("$consumption-start", optimalConsumptionStart.ToString("dddd HH:mm", culture))
                                 .Replace("$prognosis-end", prognosisEnd.ToString("dddd HH:mm", culture))
                                 .Replace("$savingspercentage", ctx.parameters.savingspercentage.ToString())
-                                .Replace("$prognosislookaheadhours", prognosisLookaheadHours.ToString() + " hours");
+                                .Replace("$prognosislookaheadhours", prognosisLookaheadHours.ToString() + " hours")
+                                .Replace("$finishnolaterthan", finishNoLaterThan.ToString("dddd HH:mm", culture))
+                                .Replace("$readableduration", ctx.parameters.readableduration)
+                                .Replace("$waitinghours", ctx.parameters.waitinghours.ToString());
+
                     return response;
                 }
                 else
@@ -220,6 +256,28 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
         }
 
+        private Duration LookupDefaultDeviceDuration(string devicetype)
+        {
+            var amount = 1;
+            if (devicetype.ToLower().Equals("dishwasher"))
+            {
+                amount = 2;
+            }
+            else if (devicetype.ToLower().Equals("tumbledryer"))
+            {
+                amount = 2;
+            }
+            else if (devicetype.ToLower().Equals("washing machine"))
+            {
+                amount = 3;
+            }
+            else if (devicetype.ToLower().Equals("car"))
+            {
+                amount = 2;
+            }
+            return new Duration { amount = amount, unit = "h" };
+        }
+
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleChargeCarIntent(DialogFlowRequestDTO request, Boolean doCharge)
         {
             try
@@ -231,7 +289,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 DateTime driveTime = parameters.time.ToUniversalTime();
                 DateTime driveDate = parameters.time.Date;
 
-                float hoursNeeded = parameters.kilometers / kilometersPerKwh / kwhPerHour;
+                double hoursNeeded = parameters.kilometers / kilometersPerKwh / kwhPerHour;
 
                 DateTime chargeTime = new DateTime(driveDate.Year, driveDate.Month, driveDate.Day, driveTime.Hour, driveTime.Minute, driveTime.Second, DateTimeKind.Utc).AddHours(-hoursNeeded);
 

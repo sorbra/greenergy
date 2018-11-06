@@ -10,14 +10,36 @@
   "responses": [
     {
       "resetContexts": false,
-      "action": "DriveSomewhereIntent.DriveSomewhereIntent-yes",
-      "affectedContexts": [],
+      "action": "chargecar.intent.yes",
+      "affectedContexts": [
+        {
+          "name": "ChargeCar-yes-followup",
+          "parameters": {},
+          "lifespan": 2
+        },
+        {
+          "name": "ChargeCar-yes-followup-2",
+          "parameters": {},
+          "lifespan": 2
+        }
+      ],
       "parameters": [],
       "messages": [
         {
           "type": 0,
           "lang": "en",
-          "speech": []
+          "speech": [
+            "I will charge your car at the best possible time for minimal carbon emissions. Please plug in your car no later than $chargeDay at $chargeTime to ensure timely charging. Would you like me to remind you to plug in?",
+            "Thank you. I will aim to minimize carbon emissions on your behalf. To ensure timely charging, you should plug in your car no later than $chargeDay at $chargeTime. Should I remind you?"
+          ]
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": [
+            "I will charge your car. Please plug in your car no later than $chargeDay at $chargeTime to ensure timely charging. Would you like me to remind you?",
+            "To ensure timely charging, you should plug in your car no later than $chargeDay at $chargeTime. Should I remind you?"
+          ]
         }
       ],
       "defaultResponsePlatforms": {},
@@ -27,7 +49,7 @@
   "priority": 500000,
   "webhookUsed": true,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1540546238,
+  "lastUpdate": 1541540517,
   "fallbackIntent": false,
   "events": []
 }
