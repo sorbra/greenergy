@@ -38,15 +38,15 @@ namespace greenergy.api.server.Controllers
             return Ok();
         }
 
+        // Set startNoEarlierThan and finishNoLaterThan to "0001-01-01" to get default return values
         [HttpGet("optimize")]
-        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
+        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
         {
             try
             {
-                var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
+                var cim =  await _prognosisRepository.OptimalConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
                 var ci = (ConsumptionInfoDTO) cim;
                 return ci;
-                // ci.currentCo2perkwh = (await _emissionsRepository.GetLatest()).Find(p => p.Region == consumptionRegion).Emission;
             }
             catch (System.Exception ex)
             {

@@ -84,10 +84,10 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 {
                     return await HandleCurrentCo2QueryIntent(request);
                 }
-                else if (action.Equals("consume.electricity.explain"))
-                {
-                    return await HandleConsumeElectricityExplain(request);
-                }
+                // else if (action.Equals("consume.electricity.explain"))
+                // {
+                //     return await HandleConsumeElectricityExplain(request);
+                // }
                 else
                 {
                     _logger.LogError($"FulfillmentController.Fulfill: Unknown action: {action}");
@@ -101,30 +101,30 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
         }
 
-        private async Task<ActionResult<DialogFlowResponseDTO>> HandleConsumeElectricityExplain(DialogFlowRequestDTO request)
-        {
-            try
-            {
-                Parameters parameters = request.queryResult.outputContexts
-                            .FirstOrDefault(oc => oc.name.EndsWith("consumeelectricity-followup"))
-                            .parameters;
+        // private async Task<ActionResult<DialogFlowResponseDTO>> HandleConsumeElectricityExplain(DialogFlowRequestDTO request)
+        // {
+        //     try
+        //     {
+        //         Parameters parameters = request.queryResult.outputContexts
+        //                     .FirstOrDefault(oc => oc.name.EndsWith("consumeelectricity-followup"))
+        //                     .parameters;
 
-                DialogFlowResponseDTO response = new DialogFlowResponseDTO();
-                response.outputContexts = request.queryResult.outputContexts;
-                var co2perkwh = parameters.currentemissions;
+        //         DialogFlowResponseDTO response = new DialogFlowResponseDTO();
+        //         response.outputContexts = request.queryResult.outputContexts;
+        //         var co2perkwh = parameters.initialemissions;
 
-                response.fulfillmentText = request.queryResult.fulfillmentText
-                            .Replace("$currentemissions", parameters.currentemissions.ToString())
-                            .Replace("$optimalemissions", parameters.optimalemissions.ToString())
-                            .Replace("$savingspercentage", parameters.savingspercentage.ToString());
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message, null);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
+        //         response.fulfillmentText = request.queryResult.fulfillmentText
+        //                     .Replace("$initialemissions", parameters.initialemissions.ToString())
+        //                     .Replace("$optimalemissions", parameters.optimalemissions.ToString())
+        //                     .Replace("$savingspercentage", parameters.savingspercentage.ToString());
+        //         return response;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, ex.Message, null);
+        //         return StatusCode(StatusCodes.Status500InternalServerError);
+        //     }
+        // }
 
         private async Task<ActionResult<DialogFlowResponseDTO>> HandleCurrentCo2QueryIntent(DialogFlowRequestDTO request)
         {
@@ -168,21 +168,21 @@ namespace greenergy.chatbot_fulfillment.Controllers
                             .FirstOrDefault(oc => oc.name.EndsWith("consume-electricity-output-context"))
                             .parameters;
 
-                var now = TimeZoneInfo.ConvertTime(DateTime.Now, _copenhagenTimeZoneInfo);
+                var nowUTC = DateTime.Now.ToUniversalTime();
+                var now = TimeZoneInfo.ConvertTime(nowUTC, _copenhagenTimeZoneInfo);
 
-                DateTime finishNoLaterThan;
+                DateTime finishNoLaterThanUTC;
 
                 if (parameters.time != DateTime.MinValue && parameters.date != DateTime.MinValue)
                 {
                     DateTime byTime = parameters.time.ToUniversalTime();
                     DateTime byDate = parameters.time.Date;
-                    finishNoLaterThan = new DateTime(byDate.Year, byDate.Month, byDate.Day, byTime.Hour, byTime.Minute, byTime.Second, DateTimeKind.Utc);
-                    finishNoLaterThan = TimeZoneInfo.ConvertTime(finishNoLaterThan, _copenhagenTimeZoneInfo);
+                    finishNoLaterThanUTC = new DateTime(byDate.Year, byDate.Month, byDate.Day, byTime.Hour, byTime.Minute, byTime.Second, DateTimeKind.Utc);
                 }
                 else
                 {
-                    finishNoLaterThan = now.AddDays(1).Date.AddHours(6);
-                    if ((finishNoLaterThan - now).TotalHours < 6) finishNoLaterThan = finishNoLaterThan.AddDays(1);
+                    finishNoLaterThanUTC = nowUTC.AddDays(1).Date.AddHours(6).ToUniversalTime();
+                    if ((finishNoLaterThanUTC - nowUTC).TotalHours < 6) finishNoLaterThanUTC = finishNoLaterThanUTC.AddDays(1);
                 }
 
                 if (parameters.duration == null)
@@ -200,8 +200,8 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 var best = await _greenergyAPI.OptimalFutureConsumptionTime(
                     consumptionMinutes: parameters.duration.toMinutes(),
                     consumptionRegion: "DK1",
-                    startNoEarlierThan: DateTime.Now,
-                    finishNoLaterThan: finishNoLaterThan
+                    startNoEarlierThan: nowUTC,
+                    finishNoLaterThan: finishNoLaterThanUTC
                 );
 
                 if (best != null)
@@ -209,36 +209,49 @@ namespace greenergy.chatbot_fulfillment.Controllers
                     DialogFlowResponseDTO response = new DialogFlowResponseDTO();
                     response.outputContexts = request.queryResult.outputContexts;
 
-                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.optimalConsumptionStart, _copenhagenTimeZoneInfo);
-                    var prognosisEnd = TimeZoneInfo.ConvertTime(best.lastPrognosisTime, _copenhagenTimeZoneInfo).AddMinutes(5);
-                    var prognosisLookaheadHours = Math.Round((prognosisEnd - now).TotalHours, 0);
+                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.optimalConsumptionStartUTC, _copenhagenTimeZoneInfo);
+                    var prognosisEnd = TimeZoneInfo.ConvertTime(best.lastPrognosisTimeUTC, _copenhagenTimeZoneInfo).AddMinutes(5);
+                    var prognosisLookaheadHours = Math.Round((best.lastPrognosisTimeUTC - nowUTC).TotalHours, 0);
+                    var finishNoLaterThan = TimeZoneInfo.ConvertTime(finishNoLaterThanUTC, _copenhagenTimeZoneInfo);
 
                     var lang = request.queryResult.languageCode;
                     var culture = CultureInfo.CreateSpecificCulture(lang);
 
-                    float savingsPercentage = (best.currentEmissions - best.optimalEmissions) / best.currentEmissions;
+                    float savingsPercentage = (best.firstEmissions - best.optimalEmissions) / best.firstEmissions;
 
                     OutputContext ctx = response.outputContexts
                                         .Find(oc => oc.name.EndsWith("consumeelectricity-followup"));
-                    ctx.parameters.prognosisend = prognosisEnd;
+                    ctx.parameters.prognosisend = best.lastPrognosisTimeUTC;
                     ctx.parameters.savingspercentage = (float)Math.Round(savingsPercentage * 100, 0);
-                    ctx.parameters.optimalemissions = best.optimalEmissions;
-                    ctx.parameters.currentemissions = best.currentEmissions;
+                    ctx.parameters.optimalemissions = Math.Round(best.optimalEmissions,0);
+                    ctx.parameters.initialemissions = Math.Round(best.firstEmissions,0);
+                    ctx.parameters.lastEmissions = Math.Round(best.lastEmissions,0);
                     ctx.parameters.optimalconsumptionstart = optimalConsumptionStart.ToString("dddd HH:mm", culture);
                     ctx.parameters.finishnolaterthan = finishNoLaterThan.ToString("dddd HH:mm", culture);
-                    ctx.parameters.duration = parameters.duration;
                     ctx.parameters.readableduration = parameters.duration.toReadableString();
-                    ctx.parameters.waitinghours = Math.Round((optimalConsumptionStart - now).TotalHours,0);
+                    ctx.parameters.waitinghours = Math.Round((best.optimalConsumptionStartUTC - nowUTC).TotalHours,0);
 
-                    response.fulfillmentText = request.queryResult.fulfillmentText
-                                .Replace("$optimalEmissions", best.optimalEmissions.ToString())
-                                .Replace("$consumption-start", optimalConsumptionStart.ToString("dddd HH:mm", culture))
-                                .Replace("$prognosis-end", prognosisEnd.ToString("dddd HH:mm", culture))
-                                .Replace("$savingspercentage", ctx.parameters.savingspercentage.ToString())
-                                .Replace("$prognosislookaheadhours", prognosisLookaheadHours.ToString() + " hours")
-                                .Replace("$finishnolaterthan", finishNoLaterThan.ToString("dddd HH:mm", culture))
-                                .Replace("$readableduration", ctx.parameters.readableduration)
-                                .Replace("$waitinghours", ctx.parameters.waitinghours.ToString());
+                    // ctx.parameters.test1 = optimalConsumptionStart.ToUniversalTime().ToString("o");
+                    // ctx.parameters.test2 = best.optimalConsumptionStart.ToUniversalTime().ToString("o");
+
+                    if (ctx.parameters.savingspercentage < 2) 
+                    {
+                        response.fulfillmentText = "Now is a good time! Do you want to know why?"
+                                    .Replace("$device",ctx.parameters.devicetype)
+                                    .Replace("$duration",parameters.duration.toReadableString());
+                    }
+                    else
+                    {
+                        response.fulfillmentText = request.queryResult.fulfillmentText
+                                    .Replace("$optimalEmissions", ctx.parameters.optimalemissions.ToString())
+                                    .Replace("$consumption-start", ctx.parameters.optimalconsumptionstart)
+                                    .Replace("$prognosis-end", prognosisEnd.ToString("dddd HH:mm", culture))
+                                    .Replace("$savingspercentage", ctx.parameters.savingspercentage.ToString())
+                                    .Replace("$prognosislookaheadhours", prognosisLookaheadHours.ToString() + " hours")
+                                    .Replace("$finishnolaterthan", ctx.parameters.finishnolaterthan)
+                                    .Replace("$readableduration", ctx.parameters.readableduration)
+                                    .Replace("$waitinghours", ctx.parameters.waitinghours.ToString());
+                    }
 
                     return response;
                 }

@@ -114,6 +114,8 @@ namespace greenergy.chatbot_fulfillment.Models
 
     public class Parameters
     {
+        // public string test1 { get; set; }
+        // public string test2 { get; set; }
         public string readableduration { get; set; }
         public DateTime date { get; set; }
         public DateTime time { get; set; }
@@ -121,8 +123,9 @@ namespace greenergy.chatbot_fulfillment.Models
         public Duration duration { get; set; }
         public DateTime prognosisend { get; set; }
         public double savingspercentage { get; set; }
-        public double currentemissions { get; set; }
+        public double initialemissions { get; set; }
         public double optimalemissions { get; set; }
+        public double lastEmissions { get; set; }
         public string optimalconsumptionstart { get; set; }
         public string finishnolaterthan { get; set; }
         public string devicetype { get; set; }
