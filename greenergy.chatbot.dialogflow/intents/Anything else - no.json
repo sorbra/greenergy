@@ -1,23 +1,26 @@
 {
-  "id": "c2dc63d2-bf31-46c5-ae71-1c6e68407d80",
-  "parentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
-  "rootParentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
-  "name": "Current Co2 Query - custom",
+  "id": "06a01a64-3a53-48ed-91d7-88b959e61bed",
+  "name": "Anything else - no",
   "auto": true,
   "contexts": [
-    "CurrentCo2Query-followup"
+    "Anything-else"
   ],
   "responses": [
     {
       "resetContexts": false,
-      "action": "CurrentCo2Query.CurrentCo2Query-custom",
+      "action": "anythingelse.no",
       "affectedContexts": [],
       "parameters": [],
       "messages": [
         {
           "type": 0,
+          "lang": "en-gb",
+          "speech": "Ok. Have a nice day."
+        },
+        {
+          "type": 0,
           "lang": "en",
-          "speech": []
+          "speech": "Ok. Have a nice day."
         }
       ],
       "defaultResponsePlatforms": {},
@@ -27,7 +30,7 @@
   "priority": 500000,
   "webhookUsed": false,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1508189124811,
+  "lastUpdate": 1541430920,
   "fallbackIntent": false,
   "events": []
 }

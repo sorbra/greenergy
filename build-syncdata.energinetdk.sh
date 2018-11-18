@@ -10,5 +10,3 @@ docker build -t $DOCKER_TAG_ENERGINETDK -f ./greenergy.syncdata.energinetdk/Dock
 # Push container to Docker Hub
 docker login -u sorbra
 docker push "$DOCKER_TAG_ENERGINETDK"
-
-read -p "Press any key to continue... " -n1 -s

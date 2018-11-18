@@ -10,26 +10,36 @@ namespace Greenergy.Database
     {
         Task UpdatePrognosisData(List<PrognosisDataMongo> prognoses);
 
-        Task<ConsumptionInfoMongo> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan);
+        Task<ConsumptionInfoMongo> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan);
     };
 
     public class ConsumptionInfoMongo
     {
-        public int co2perkwh { get; set; }
-        public DateTime consumptionStart { get; set; }
+        public float firstEmissions { get; set; }
+        public float optimalEmissions { get; set; }
+        public float lastEmissions { get; set; }
+        public DateTime firstConsumptionStartUTC { get; set; }
+        public DateTime optimalConsumptionStartUTC { get; set; }
+        public DateTime lastConsumptionStartUTC { get; set; }
         public int consumptionMinutes { get; set; }
         public string consumptionRegion { get; set; }
-        public DateTime lastPrognosisUpdateTime { get; set; }
+        public DateTime prognosisUpdateTimeUTC { get; set; }
+        public DateTime lastPrognosisTimeUTC { get; set; }
 
         public static explicit operator ConsumptionInfoDTO(ConsumptionInfoMongo cim)
         {
             return new ConsumptionInfoDTO
             {
-                co2perkwh = cim.co2perkwh,
-                consumptionStart = cim.consumptionStart,
+                firstEmissions = cim.firstEmissions,
+                optimalEmissions = cim.optimalEmissions,
+                lastEmissions = cim.lastEmissions,
+                firstConsumptionStartUTC = cim.firstConsumptionStartUTC,
+                optimalConsumptionStartUTC = cim.optimalConsumptionStartUTC,
+                lastConsumptionStartUTC = cim.lastConsumptionStartUTC,
                 consumptionMinutes = cim.consumptionMinutes,
                 consumptionRegion = cim.consumptionRegion,
-                lastPrognosisUpdateTime = cim.lastPrognosisUpdateTime
+                prognosisUpdateTimeUTC = cim.prognosisUpdateTimeUTC,
+                lastPrognosisTimeUTC = cim.lastPrognosisTimeUTC
             };
         }
     }

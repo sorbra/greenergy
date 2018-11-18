@@ -18,11 +18,13 @@ namespace greenergy.api.server.Controllers
     {
         private ILogger<PrognosisController> _logger;
         private IPrognosisRepository _prognosisRepository;
+        private IEmissionsRepository _emissionsRepository;
 
-        public PrognosisController (ILogger<PrognosisController> logger, IPrognosisRepository prognosisRepository)
+        public PrognosisController (ILogger<PrognosisController> logger, IPrognosisRepository prognosisRepository, IEmissionsRepository emissionsRepository)
         {
             _logger = logger;
             _prognosisRepository = prognosisRepository;
+            _emissionsRepository = emissionsRepository;
         }
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
@@ -36,13 +38,15 @@ namespace greenergy.api.server.Controllers
             return Ok();
         }
 
+        // Set startNoEarlierThan and finishNoLaterThan to "0001-01-01" to get default return values
         [HttpGet("optimize")]
-        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEalierThan, DateTime finishNoLaterThan)
+        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
         {
             try
             {
-                var cim =  await _prognosisRepository.OptimalFutureConsumptionTime(consumptionMinutes, consumptionRegion, startNoEalierThan, finishNoLaterThan);
-                return (ConsumptionInfoDTO) cim;
+                var cim =  await _prognosisRepository.OptimalConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
+                var ci = (ConsumptionInfoDTO) cim;
+                return ci;
             }
             catch (System.Exception ex)
             {

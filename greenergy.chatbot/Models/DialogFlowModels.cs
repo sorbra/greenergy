@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace greenergy.chatbot_fulfillment.Models
 {
@@ -24,6 +25,7 @@ namespace greenergy.chatbot_fulfillment.Models
     public class QueryResult
     {
         public string queryText { get; set; }
+        public string action { get; set; }
         public Parameters parameters { get; set; }
         public bool allRequiredParamsPresent { get; set; }
         public string fulfillmentText { get; set; }
@@ -112,26 +114,50 @@ namespace greenergy.chatbot_fulfillment.Models
 
     public class Parameters
     {
+        // public string test1 { get; set; }
+        // public string test2 { get; set; }
+        public string readableduration { get; set; }
         public DateTime date { get; set; }
         public DateTime time { get; set; }
-        public float kilometers { get; set; }
+        public double kilometers { get; set; }
         public Duration duration { get; set; }
+        public DateTime prognosisend { get; set; }
+        public double savingspercentage { get; set; }
+        public double initialemissions { get; set; }
+        public double optimalemissions { get; set; }
+        public double lastEmissions { get; set; }
+        public string optimalconsumptionstart { get; set; }
+        public string finishnolaterthan { get; set; }
+        public string devicetype { get; set; }
+        public double waitinghours { get; set; }
     }
 
     public class Duration
     {
-        public int amount { get; set; }
+        public float amount { get; set; }
         public string unit { get; set; }
 
         public int toMinutes()
         {
             if (unit.Equals("min"))
-                return amount;
+                return (int)amount;
             else if (unit.Equals("h"))
-                return amount*60;
+                return (int)amount * 60;
             else if (unit.Equals("day"))
-                return amount*60*24;
+                return (int)amount * 60 * 24;
             return -1;
+        }
+
+        public string toReadableString()
+        {
+            if (unit.Equals("min"))
+                return $"{amount} minutes";
+            else if (unit.Equals("h"))
+                if (amount==1) return "hour";
+                else return $"{amount} hours";
+            else if (unit.Equals("day"))
+                return $"{amount} days";
+            return $"{amount} {unit}";
         }
     }
 

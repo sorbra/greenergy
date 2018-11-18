@@ -11,9 +11,28 @@
     "googleAssistantCompatible": true,
     "project": "greenergy-3dbfe",
     "welcomeIntentSignInRequired": false,
-    "startIntents": [],
+    "startIntents": [
+      {
+        "intentId": "460c430c-52a7-4313-8e23-20bb9e191bf0",
+        "signInRequired": false
+      },
+      {
+        "intentId": "6e9a8963-9a74-4343-8e0d-a7b2563db55c",
+        "signInRequired": false
+      },
+      {
+        "intentId": "5845fca2-2532-4aca-ab69-d89947557032",
+        "signInRequired": false
+      }
+    ],
     "systemIntents": [],
-    "endIntentIds": [],
+    "endIntentIds": [
+      "06a01a64-3a53-48ed-91d7-88b959e61bed",
+      "460c430c-52a7-4313-8e23-20bb9e191bf0",
+      "10213103-0db4-4ba1-a403-7fcaab8a6722",
+      "2f19e6a9-a5c9-404c-a4e0-4d34f90edeba",
+      "94ba5354-b3ef-412b-bda0-d7af36023cc0"
+    ],
     "oAuthLinking": {
       "required": false,
       "grantType": "AUTH_CODE_GRANT"
@@ -21,14 +40,15 @@
     "voiceType": "MALE_1",
     "capabilities": [],
     "protocolVersion": "V2",
+    "autoPreviewEnabled": true,
     "isDeviceAgent": false
   },
-  "defaultTimezone": "Europe/Kaliningrad",
+  "defaultTimezone": "Europe/Madrid",
   "webhook": {
-    "url": "https://api-kmd-lg.azure-api.net/greenergy/api/Fulfillment",
+    "url": "https://api-kmd-lg.azure-api.net/chat/api/Fulfillment",
     "headers": {
       "": "",
-      "Ocp-Apim-Subscription-Key": "0aeefaa25d4c4fb285dce5e4597edd3c"
+      "Ocp-Apim-Subscription-Key": "ad172c5a95a743aca3cb891bf945d9f7"
     },
     "available": true,
     "useForDomains": false,
@@ -38,8 +58,10 @@
   "isPrivate": true,
   "customClassifierMode": "use.after",
   "mlMinConfidence": 0.3,
-  "supportedLanguages": [],
-  "onePlatformApiVersion": "v2",
+  "supportedLanguages": [
+    "en-gb"
+  ],
+  "onePlatformApiVersion": "v2beta1",
   "analyzeQueryTextSentiment": false,
   "enabledKnowledgeBaseNames": [],
   "knowledgeServiceConfidenceAdjustment": -0.4,

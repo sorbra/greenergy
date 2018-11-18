@@ -1,0 +1,31 @@
+[
+  {
+    "value": "car",
+    "synonyms": [
+      "car",
+      "auto"
+    ]
+  },
+  {
+    "value": "dishwasher",
+    "synonyms": [
+      "dishwasher",
+      "dish washer"
+    ]
+  },
+  {
+    "value": "tumbledryer",
+    "synonyms": [
+      "tumbledryer",
+      "tumbler",
+      "dryer"
+    ]
+  },
+  {
+    "value": "washing machine",
+    "synonyms": [
+      "washing machine",
+      "washer"
+    ]
+  }
+]

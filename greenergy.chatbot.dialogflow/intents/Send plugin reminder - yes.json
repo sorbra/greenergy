@@ -1,0 +1,50 @@
+{
+  "id": "2f19e6a9-a5c9-404c-a4e0-4d34f90edeba",
+  "parentId": "07a5c59b-1bdc-4dc5-8788-5380b48c5324",
+  "rootParentId": "5845fca2-2532-4aca-ab69-d89947557032",
+  "name": "Send plugin reminder - yes",
+  "auto": true,
+  "contexts": [
+    "ChargeCar-yes-followup"
+  ],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "send.charging.reminder.yes",
+      "affectedContexts": [
+        {
+          "name": "Sendpluginreminder-yes-followup",
+          "parameters": {},
+          "lifespan": 2
+        }
+      ],
+      "parameters": [],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": [
+            "I\u0027ll remind you. Have a nice day.",
+            "Will do. See you later!"
+          ]
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
+          "speech": [
+            "I\u0027ll remind you. Have a nice day.",
+            "Will do. See you later!"
+          ]
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1541540540,
+  "fallbackIntent": false,
+  "events": []
+}

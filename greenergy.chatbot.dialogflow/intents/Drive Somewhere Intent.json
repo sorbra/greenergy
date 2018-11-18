@@ -24,6 +24,10 @@
             {
               "lang": "en",
               "value": "How many kilometers do you need to drive?"
+            },
+            {
+              "lang": "en-gb",
+              "value": "How many kilometers do you need to drive?"
             }
           ],
           "isList": false
@@ -37,6 +41,10 @@
           "prompts": [
             {
               "lang": "en",
+              "value": "What day do you need to leave?"
+            },
+            {
+              "lang": "en-gb",
               "value": "What day do you need to leave?"
             }
           ],
@@ -52,15 +60,28 @@
             {
               "lang": "en",
               "value": "What time do you need to leave?"
+            },
+            {
+              "lang": "en-gb",
+              "value": "What time do you need to leave?"
             }
           ],
           "isList": false
         },
         {
           "id": "d28d3844-c9c6-4897-8631-4bfaacf9362f",
+          "required": false,
           "dataType": "@sys.geo-city",
           "name": "geo-city",
           "value": "$geo-city",
+          "isList": false
+        },
+        {
+          "id": "6d51bc46-0829-4459-8d35-c35fffd21297",
+          "required": false,
+          "dataType": "@sys.time-period",
+          "name": "time-period",
+          "value": "$time-period",
           "isList": false
         }
       ],
@@ -68,6 +89,11 @@
         {
           "type": 0,
           "lang": "en",
+          "speech": "would you like me to charge your car for you?"
+        },
+        {
+          "type": 0,
+          "lang": "en-gb",
           "speech": "would you like me to charge your car for you?"
         }
       ],
@@ -78,7 +104,7 @@
   "priority": 500000,
   "webhookUsed": false,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1540547999,
+  "lastUpdate": 1541541496,
   "fallbackIntent": false,
   "events": []
 }

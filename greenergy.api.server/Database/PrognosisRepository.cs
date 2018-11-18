@@ -44,11 +44,21 @@ namespace Greenergy.Database
             }
         }
 
-
-        public async Task<ConsumptionInfoMongo> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
+        public async Task<ConsumptionInfoMongo> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
         {
-            if (startNoEarlierThan == null) startNoEarlierThan = DateTime.Now;
-            if (finishNoLaterThan == null) finishNoLaterThan = DateTime.MaxValue;
+            if (startNoEarlierThan.Equals(DateTime.MinValue))
+            {
+                startNoEarlierThan = DateTime.Now.ToUniversalTime();
+            }
+            else
+            {
+                startNoEarlierThan = startNoEarlierThan.ToUniversalTime();
+            }
+
+            if (finishNoLaterThan.Equals(DateTime.MinValue)) 
+            {
+                finishNoLaterThan = DateTime.MaxValue.ToUniversalTime();
+            }
 
             var prognoses = await _context.PrognosisCollection
                     .Find(p => (p.TimeStampUTC.CompareTo(startNoEarlierThan) >= 0)
@@ -59,10 +69,10 @@ namespace Greenergy.Database
 
             if (prognoses == null || prognoses.Count() == 0)
             {
-                throw new NotSupportedException("No matching prognosis data");
+                throw new NotSupportedException("No prognosis data");
             }
 
-            var lastPrognosisTime = prognoses[prognoses.Count() - 1].TimeStampUTC;
+            var lastPrognosisTime = prognoses.Last().TimeStampUTC;
             var minutesLeft = (int)(lastPrognosisTime - DateTime.Now).TotalMinutes;
             if (minutesLeft < consumptionMinutes || consumptionMinutes == 0)
             {
@@ -71,8 +81,9 @@ namespace Greenergy.Database
             }
 
             int windowSize = (int)Math.Ceiling(consumptionMinutes / 5f);
-            var minTotalEmission = prognoses.Take(windowSize).Sum(p => p.Emission);
-            var curTotalEmission = minTotalEmission;
+            var minTotalEmissions = prognoses.Take(windowSize).Sum(p => p.Emission);
+            var initialEmissions = minTotalEmissions;
+            var curTotalEmissions = minTotalEmissions;
 
             int inxStart = 0;
             int inxMinStart = 0;
@@ -81,25 +92,31 @@ namespace Greenergy.Database
 
             while (inxEnd < count)
             {
-                curTotalEmission = curTotalEmission + prognoses[inxEnd].Emission - prognoses[inxStart].Emission;
+                curTotalEmissions = curTotalEmissions + prognoses[inxEnd].Emission - prognoses[inxStart].Emission;
 
                 inxEnd++; inxStart++;
 
-                if (curTotalEmission < minTotalEmission)
+                if (Math.Round((double) curTotalEmissions/windowSize,0) < Math.Round((double) minTotalEmissions/windowSize))
                 {
-                    minTotalEmission = curTotalEmission;
+                    minTotalEmissions = curTotalEmissions;
                     inxMinStart = inxStart;
                 }
             }
 
             return new ConsumptionInfoMongo
             {
-                co2perkwh = minTotalEmission / windowSize,
-                consumptionStart = prognoses[inxMinStart].TimeStampUTC,
+                firstEmissions = initialEmissions / windowSize,
+                optimalEmissions = minTotalEmissions / windowSize,
+                lastEmissions = curTotalEmissions / windowSize,
+                firstConsumptionStartUTC = prognoses.First().TimeStampUTC,
+                optimalConsumptionStartUTC = prognoses[inxMinStart].TimeStampUTC,
+                lastConsumptionStartUTC = prognoses[inxStart].TimeStampUTC,
                 consumptionMinutes = consumptionMinutes,
                 consumptionRegion = consumptionRegion,
-                lastPrognosisUpdateTime = prognoses[0].CreatedOn
+                prognosisUpdateTimeUTC = prognoses.First().CreatedOn,
+                lastPrognosisTimeUTC = prognoses.Last().TimeStampUTC
             };
         }
+
     }
 }
