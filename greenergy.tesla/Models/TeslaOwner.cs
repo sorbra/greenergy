@@ -60,7 +60,7 @@ namespace Greenergy.Tesla
 
         public async Task<List<TeslaVehicle>> GetVehiclesAsync()
         {
-            var response = await Client.GetAsync(TeslaAPI.GET_VEHICLES_PATH);
+            var response = await Client.GetAsync(TeslaAPI.VEHICLES_API_BASE_URI);
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new Exception($"Failed to get Tesla Vehicles. StatusCode={response.StatusCode}, Reason={response.ReasonPhrase}");

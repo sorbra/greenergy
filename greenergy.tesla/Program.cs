@@ -11,7 +11,13 @@ namespace Greenergy.Tesla
             TeslaOwner owner = new TeslaOwner(email);
             await owner.AuthenticateAsync(password);
             var vehicles = await owner.GetVehiclesAsync();
-            var chargeState = await vehicles.FirstOrDefault().GetChargeStateAsync();
+            
+            var myTesla = vehicles.FirstOrDefault();
+            
+            var chargeState = await myTesla.GetChargeStateAsync();
+
+            bool charging = await myTesla.StartCharge();
+            
 
             // var response = await hclient.GetAsync(client.BaseUri+$"/api/1/vehicles/{vehicle.Id}/data_request/charge_state");
             // var cstate = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
