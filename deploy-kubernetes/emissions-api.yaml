@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: api-service
+  name: emissions-api-service
 spec:
   selector:
-    app: greenergy-api
+    app: emissions-api
   ports:
   - protocol: TCP
     name: http
@@ -15,28 +15,28 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: greenergy-api-deployment
+  name: emissions-api-deployment
   labels:
-    app: greenergy-api
+    app: emissions-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: greenergy-api
+      app: emissions-api
   template:
     metadata:
       labels:
-        app: greenergy-api
+        app: emissions-api
     spec:
       containers:
-      - name:  greenergy-api
-        image: sorbra/greenergy.api.server:0.1.0
+      - name:  emissions-api
+        image: sorbra/emissions-api:0.2.0
         imagePullPolicy: Always
         volumeMounts: 
         - name: "appsettings"
-          mountPath: "/app/greenergy.api.server/appsettings.json"
+          mountPath: "/app/emissions-api.server/appsettings.json"
           subPath: "appsettings.json"
       volumes:
       - name: "appsettings"
         configMap: 
-          name: "greenergy.api.server.appsettings"
+          name: "emissions-api.appsettings"

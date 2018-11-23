@@ -8,3 +8,4 @@ echo ConnectionString="mongodb://root:$MONGODB_ROOT_PASSWORD@:$NODE_IP:$NODE_POR
 
 read -p "Press any key to continue... " -n1 -s
 
+

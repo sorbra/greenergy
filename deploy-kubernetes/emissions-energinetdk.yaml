@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: emissions-energinetdk-deployment
+  labels:
+    app: emissions-energinetdk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emissions-energinetdk
+  template:
+    metadata:
+      labels:
+        app: emissions-energinetdk
+    spec:
+      containers:
+      - name:  emissions-energinetdk
+        image: sorbra/emissions-energinetdk:0.2.0
+        imagePullPolicy: Always
+        volumeMounts: 
+        - name: "appsettings"
+          mountPath: "/app/emissions-energinetdk/appsettings.json"
+          subPath: "appsettings.json"
+      volumes:
+      - name: "appsettings"
+        configMap: 
+          name: "emissions-energinetdk.appsettings"

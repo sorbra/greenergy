@@ -90,6 +90,15 @@ namespace greenergy.chatbot_fulfillment
                 //                app.UseHttpsRedirection();
             }
 
+            foreach (var conf in _config.GetSection("Fulfillment").AsEnumerable().ToList())
+            {
+                _logger.LogInformation($"{conf.Key}, {conf.Value}");
+            }
+            foreach (var conf in _config.GetSection("GreenergyAPI").AsEnumerable().ToList())
+            {
+                _logger.LogInformation($"{conf.Key}, {conf.Value}");
+            }
+
             app.UseMvc();
         }
     }

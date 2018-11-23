@@ -181,7 +181,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
                 }
                 else
                 {
-                    finishNoLaterThanUTC = nowUTC.AddDays(1).Date.AddHours(6).ToUniversalTime();
+                    finishNoLaterThanUTC = now.AddDays(1).Date.AddHours(6).ToUniversalTime();
                     if ((finishNoLaterThanUTC - nowUTC).TotalHours < 6) finishNoLaterThanUTC = finishNoLaterThanUTC.AddDays(1);
                 }
 

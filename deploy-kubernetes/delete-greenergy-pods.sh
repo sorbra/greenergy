@@ -1,7 +1,7 @@
 #!/bin/bash
 
-./deletepod.sh greenergy-api
-./deletepod.sh greenergy-chatbot
-./deletepod.sh greenergy-syncdata-energinetdk
+./deletepod.sh emissions-api
+./deletepod.sh chatbot
+./deletepod.sh emissions-energinetdk
 
 read -p "Press any key to continue... " -n1 -s

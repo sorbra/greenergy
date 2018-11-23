@@ -4,7 +4,7 @@
     },
     "GreenergyAPI": {
         "Protocol": "http",
-        "Host": "api-service",
+        "Host": "emissions-api-service",
         "Port": "80"
     },
     "Logging": {
