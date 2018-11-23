@@ -47,7 +47,7 @@ namespace greenergy.chatbot_fulfillment
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSingleton<IGreenergyAPI, GreenergyAPI>();
+            services.AddSingleton<IGreenergyAPI, GreenergyAPIClient>();
 
             services.AddSwaggerGen(c =>
             {

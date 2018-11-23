@@ -14,5 +14,6 @@ namespace Greenergy.API
         Task<List<EmissionDataDTO>> GetMostRecentEmissions();
         Task UpdateEmissionsPrognosis(List<EmissionDataDTO> prognosis);
         Task<ConsumptionInfoDTO> OptimalFutureConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan);
+        Task<List<EmissionDataDTO>> GetEmissionsPrognosis();
     }
 }

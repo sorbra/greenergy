@@ -73,5 +73,13 @@ namespace Greenergy.Tesla
             return response.response;
         }
 
+        public async Task<bool> SetChargeLimit(int percent)
+        {
+            var response = await PostCommand<TeslaCommandResponseDTO>(
+                "set_charge_limit", 
+                new { percent = percent }
+            );
+            return response.response;
+        }
     }
 }

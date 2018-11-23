@@ -16,6 +16,8 @@ namespace Greenergy.Tesla
             
             var chargeState = await myTesla.GetChargeStateAsync();
 
+            bool limitset = await myTesla.SetChargeLimit(60);
+
             bool charging = await myTesla.StartCharge();
             
 

@@ -49,7 +49,7 @@ namespace Greenergy
                     services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
                     services.Configure<GreenergyAPISettings>(hostContext.Configuration.GetSection("greenergyapi"));
 
-                    services.AddTransient<IGreenergyAPI, GreenergyAPI>();
+                    services.AddTransient<IGreenergyAPI, GreenergyAPIClient>();
                     services.AddTransient<IEnerginetAPI, EnerginetAPI>();
 
                     services.AddHostedService<GreenergyService>();

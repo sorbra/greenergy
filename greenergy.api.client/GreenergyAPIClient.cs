@@ -11,14 +11,14 @@ using Greenergy.API.Models;
 
 namespace Greenergy.API
 {
-    public class GreenergyAPI : IGreenergyAPI
+    public class GreenergyAPIClient : IGreenergyAPI
     {
         private IOptions<GreenergyAPISettings> _config;
-        private ILogger<GreenergyAPI> _logger;
+        private ILogger<GreenergyAPIClient> _logger;
 
-        public GreenergyAPI(
+        public GreenergyAPIClient(
             IOptions<GreenergyAPISettings> config,
-            ILogger<GreenergyAPI> logger)
+            ILogger<GreenergyAPIClient> logger)
         {
             _config = config;
             _logger = logger;
@@ -121,6 +121,26 @@ namespace Greenergy.API
             catch (System.Exception ex)
             {
                 _logger.LogCritical(ex, ex.Message, null);
+                return null;
+            }
+        }
+
+        public async Task<List<EmissionDataDTO>> GetEmissionsPrognosis()
+        {
+            string apiURL = $"{_config.Value.Protocol}://{_config.Value.Host}:{_config.Value.Port}/api/prognosis";
+
+            try
+            {
+                using (HttpClient client = NewClient())
+                {
+                    var jsonString = await client.GetStringAsync(apiURL);
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<List<EmissionDataDTO>>(jsonString);
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogCritical(ex, ex.Message);
                 return null;
             }
         }

@@ -17,7 +17,6 @@ namespace Greenergy.Database
 
         public PrognosisRepository(IEmissionDataContext context)
         {
-            //            _context = new EmissionDataContext(settings);
             _context = context;
         }
 
