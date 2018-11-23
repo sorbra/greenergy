@@ -1,11 +1,9 @@
 #!/bin/bash
 
-source  $(dirname "$0")/set-docker-tags.sh
-
-echo Tag: $DOCKER_TAG_CHATBOT
+export DOCKER_TAG_CHATBOT="sorbra/emissions-chatbot:0.2.0"
 
 # Build the docker container and tag it.
-docker build -t $DOCKER_TAG_CHATBOT -f ./greenergy.chatbot/Dockerfile .
+docker build -t $DOCKER_TAG_CHATBOT -f ./chatbot/chatbot.fulfillment/Dockerfile .
 
 # Push container to Docker Hub
 docker login -u sorbra

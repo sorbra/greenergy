@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Greenergy.Database;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Greenergy.Emissions.API.Server.Models.Mongo;
+using Greenergy.Emissions.API.Client.Models;
+
+namespace Greenergy.Emissions.API.Server.Controllers
+{
+    
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PrognosisController : ControllerBase
+    {
+        private ILogger<PrognosisController> _logger;
+        private IPrognosisRepository _prognosisRepository;
+        private IEmissionsRepository _emissionsRepository;
+
+        public PrognosisController (ILogger<PrognosisController> logger, IPrognosisRepository prognosisRepository, IEmissionsRepository emissionsRepository)
+        {
+            _logger = logger;
+            _prognosisRepository = prognosisRepository;
+            _emissionsRepository = emissionsRepository;
+        }
+
+        // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
+        [HttpPost]
+        public async Task<ActionResult> UpdatePrognoses([FromBody] List<PrognosisDataMongo> prognoses )
+        {
+            await _prognosisRepository.UpdatePrognosisData(prognoses);
+
+            _logger.LogDebug($"Received {prognoses.Count} EmissionData elements");
+
+            return Ok();
+        }
+
+        // Set startNoEarlierThan and finishNoLaterThan to "0001-01-01" to get default return values
+        [HttpGet("optimize")]
+        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
+        {
+            try
+            {
+                var cim =  await _prognosisRepository.OptimalConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
+                var ci = (ConsumptionInfoDTO) cim;
+                return ci;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Exception in PrognosisController.OptimalFutureConsumptionTime", null);
+                return null;
+            }
+        }
+    }
+}
