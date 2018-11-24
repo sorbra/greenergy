@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.1/greenergy.api.server.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.1/emissions-api.server.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

@@ -29,9 +29,11 @@ namespace Greenergy.Emissions.API.Server.Controllers
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
         [HttpPost]
-        public async Task<ActionResult> UpdatePrognoses([FromBody] List<PrognosisDataMongo> prognoses )
+        public async Task<ActionResult> UpdatePrognoses([FromBody] List<EmissionDataDTO> prognoses )
         {
-            await _prognosisRepository.UpdatePrognosisData(prognoses);
+            await _prognosisRepository.UpdatePrognosisData(
+                    prognoses.Select(edto => new PrognosisDataMongo( edto.Emission, edto.EmissionTimeUTC.UtcDateTime, edto.Region)).ToList()
+            );
 
             _logger.LogDebug($"Received {prognoses.Count} EmissionData elements");
 
@@ -40,17 +42,17 @@ namespace Greenergy.Emissions.API.Server.Controllers
 
         // Set startNoEarlierThan and finishNoLaterThan to "0001-01-01" to get default return values
         [HttpGet("optimize")]
-        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
+        public async Task<ActionResult<ConsumptionInfoDTO>> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTimeOffset startNoEarlierThan, DateTimeOffset finishNoLaterThan)
         {
             try
             {
-                var cim =  await _prognosisRepository.OptimalConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan);
+                var cim =  await _prognosisRepository.OptimalConsumptionTime(consumptionMinutes, consumptionRegion, startNoEarlierThan.UtcDateTime, finishNoLaterThan.UtcDateTime);
                 var ci = (ConsumptionInfoDTO) cim;
                 return ci;
             }
             catch (System.Exception ex)
             {
-                _logger.LogError(ex, "Exception in PrognosisController.OptimalFutureConsumptionTime", null);
+                _logger.LogError(ex, ex.Message);
                 return null;
             }
         }

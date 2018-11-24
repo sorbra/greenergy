@@ -1,8 +1,6 @@
 #!/bin/bash
 
-pwd
 cd "$(dirname "$0")"
-pwd
 
 export DOCKER_TAG_API="sorbra/emissions-api:0.2.0"
 

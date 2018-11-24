@@ -3,11 +3,6 @@ FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
-RUN mkdir ./emissions-api.client
-COPY ./emissions-api.client/emissions-api.client.csproj ./emissions-api.client
-RUN dotnet restore ./emissions-api.client
-
-# copy csproj and restore as distinct layers
 RUN mkdir ./emissions-api.server
 COPY ./emissions-api.server/emissions-api.server.csproj ./emissions-api.server
 RUN dotnet restore ./emissions-api.server

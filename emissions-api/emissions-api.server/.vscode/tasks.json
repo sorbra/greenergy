@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/greenergy.api.server.csproj"
+                "${workspaceFolder}/emissions-api.server.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

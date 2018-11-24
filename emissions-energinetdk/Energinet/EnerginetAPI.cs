@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 using Greenergy.Settings;
 using Microsoft.Extensions.Options;
-using Greenergy.Emissions.API.Client.Models;
+using Greenergy.Emissions.API;
 
 namespace Greenergy.Energinet
 {
@@ -18,7 +18,7 @@ namespace Greenergy.Energinet
         {
             _config = config;
         }
-        public async Task<List<EmissionDataDTO>> GetRecentEmissions(DateTime noEarlierThan)
+        public async Task<List<EmissionDataDTO>> GetRecentEmissions(DateTimeOffset noEarlierThan)
         {
 
             var request = EnerginetBlobCreateRequestDTO.NewEmissionsRequest(noEarlierThan);
@@ -57,11 +57,11 @@ namespace Greenergy.Energinet
                         foreach (var record in emissionsJsonResponse.records)
                         {
                             results.Add(
-                                new EmissionDataDTO(
-                                    Emission: Int32.Parse(record[3]),
-                                    TimeStampUTC: DateTime.Parse(record[0]),
-                                    Region: record[2]
-                            ));
+                                new EmissionDataDTO() {
+                                    Emission = Int32.Parse(record[3]),
+                                    EmissionTimeUTC = DateTimeOffset.Parse(record[0]),
+                                    Region = record[2]
+                            });
                         }
                         return results;
                     }

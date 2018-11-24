@@ -7,8 +7,10 @@ namespace Greenergy.Emissions.API.Server.Models.Mongo
 {
     public class PrognosisDataMongo: EmissionDataMongo
     {
-        public PrognosisDataMongo (int Emission, DateTime TimeStampUTC, string Region) 
-                    : base (Emission, TimeStampUTC, Region)
+        public DateTime UpdatedTimeUTC { get; set; } = DateTime.UtcNow;
+
+        public PrognosisDataMongo (int Emission, DateTime EmissionTimeUTC, string Region) 
+                    : base (Emission, EmissionTimeUTC, Region)
         {
         }
     }

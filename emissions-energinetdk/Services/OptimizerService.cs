@@ -7,32 +7,48 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using Greenergy.Settings;
 using Greenergy.Energinet;
-using Greenergy.Emissions.API.Client;
-using Greenergy.Emissions.API.Client.Models;
+using Greenergy.Emissions.API;
+using System.Net.Http;
 
 namespace Greenergy.Services
 {
     public class OptimizerService : IHostedService, IDisposable
     {
-        private readonly IOptions<OptimizerSettings> _config;
+        private readonly IOptions<ApplicationSettings> _config;
         private readonly ILogger _logger;
         private readonly IApplicationLifetime _applicationLifetime;
-        private readonly IGreenergyAPI _greenergyAPI;
 
         private Timer _runOptimizerTimer;
         private TimeZoneInfo _copenhagenTimeZoneInfo;
-
+        private HttpClient _httpClient;
+        private EmissionsClient EmissionsClient
+        {
+            get
+            {
+                var client = new EmissionsClient(_httpClient);
+                client.BaseUrl = _config.Value.EmissionsServiceBaseURL;
+                return client;
+            }
+        }
+        private PrognosisClient PrognosisClient
+        {
+            get
+            {
+                var client = new PrognosisClient(_httpClient);
+                client.BaseUrl = _config.Value.EmissionsServiceBaseURL;
+                return client;
+            }
+        }
         public OptimizerService(
-            IOptions<OptimizerSettings> config,
+            IOptions<ApplicationSettings> config,
             IApplicationLifetime applicationLifetime,
-            ILogger<OptimizerService> logger,
-            IGreenergyAPI greenergyAPI
+            ILogger<OptimizerService> logger
         )
         {
             _config = config;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
-            _greenergyAPI = greenergyAPI;
+            _httpClient = new HttpClient();
 
             try
             {
@@ -62,27 +78,6 @@ namespace Greenergy.Services
         {
             try
             {
-                // For now, always look for the optimal time between midnight and 6AM.
-                // This will need to be configurable by device/person, but for now this default
-                // suits me, since I get cheaper electricity in this time interval
-
-                var nowUTC = DateTime.Now.ToUniversalTime();
-                var now = TimeZoneInfo.ConvertTime(nowUTC, _copenhagenTimeZoneInfo);
-
-                DateTime finishNoLaterThanUTC = nowUTC.AddDays(1).Date.AddHours(6).ToUniversalTime();
-                if ((finishNoLaterThanUTC - nowUTC).TotalHours < 6) finishNoLaterThanUTC = finishNoLaterThanUTC.AddDays(1);
-
-
-
-
-                var prognoses = await _greenergyAPI.OptimalFutureConsumptionTime(
-                    consumptionMinutes: 120,
-                    "DK1",
-                    DateTime.UtcNow,
-                    DateTime.MaxValue
-                );
-
-
 
             }
             catch (System.Exception ex)

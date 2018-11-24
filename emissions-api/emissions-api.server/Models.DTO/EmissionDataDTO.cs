@@ -4,10 +4,10 @@ namespace Greenergy.Emissions.API.Client.Models
 {
     public class EmissionDataDTO
     {
-        public EmissionDataDTO (int Emission, DateTime TimeStampUTC, string Region)
+        public EmissionDataDTO (int Emission, DateTimeOffset EmissionTimeUTC, string Region)
         {
             this.Emission = Emission;
-            this.TimeStampUTC = TimeStampUTC;
+            this.EmissionTimeUTC = EmissionTimeUTC;
             this.Region = Region;
         }
         public EmissionDataDTO()
@@ -16,9 +16,9 @@ namespace Greenergy.Emissions.API.Client.Models
 
         public int Emission { get; set; }
 
-        public DateTime TimeStampUTC { get; set; }
+        public DateTimeOffset EmissionTimeUTC { get; set; }
         
         public string Region { get; set; }      
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTimeOffset RecordedTimeUTC { get; set; } = DateTimeOffset.Now;
     }
 }

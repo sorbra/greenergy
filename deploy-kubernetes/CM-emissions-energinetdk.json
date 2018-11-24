@@ -4,12 +4,8 @@
         "Name": "Greenergy Service Development",
         "UserAgent": "Greenergy Data Synchronizer",
         "EmissionsSyncRateInMinutes": 5,
-        "PrognosisSyncRateInMinutes": 5
-    },
-    "GreenergyAPI": {
-        "Protocol": "http",
-        "Host": "emissions-api-service",
-        "Port": "80"
+        "PrognosisSyncRateInMinutes": 5,
+        "EmissionsServiceBaseURL": "http://emissions-api-service:80/"
     },
     "Logging": {
         "LogLevel": {

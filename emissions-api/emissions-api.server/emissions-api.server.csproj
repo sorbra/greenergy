@@ -9,16 +9,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../emissions-api.client/emissions-api.client.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
-    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0"/>
+    <PackageReference Include="NSwag.AspNetCore" Version="12.0.0" />
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0"/>
-    <PackageReference Include="MongoDB.Driver" Version="2.6.1"/>
+    <PackageReference Include="MongoDB.Driver" Version="2.6.1" />
   </ItemGroup>
 
 </Project>

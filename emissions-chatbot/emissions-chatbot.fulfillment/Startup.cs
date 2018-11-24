@@ -15,8 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using Greenergy.Emissions.API.Client;
+using Greenergy.Emissions.API;
 
 namespace greenergy.chatbot_fulfillment
 {
@@ -37,7 +36,6 @@ namespace greenergy.chatbot_fulfillment
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<EmissionsClientSettings>(_config.GetSection("GreenergyAPI"));
             services.Configure<FulfillmentSettings>(_config.GetSection("Fulfillment"));
 
             services.AddMvc(config =>
@@ -47,38 +45,12 @@ namespace greenergy.chatbot_fulfillment
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddSingleton<IGreenergyAPI, GreenergyAPIClient>();
-
-            services.AddSwaggerGen(c =>
-            {
-                // Register the Swagger generator, defining 1 or more Swagger documents
-                c.SwaggerDoc(ApiVersion, new Info
-                {
-                    Version = ApiVersion,
-                    Title = "Greenergy Energy Chatbot Backend API",
-                    Description = "API to serve Dialogflow chatbot",
-                    Contact = new Contact
-                    {
-                        Name = "Søren Brandt",
-                        Email = "sorbra@gmail.com",
-                        Url = "https://www.linkedin.com/in/sorenbrandt/"
-                    }
-                });
-
-                c.CustomSchemaIds((type) => type.FullName);
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint($"/swagger/{ApiVersion}/swagger.json", "Greenergy Energy Data API");
-            });
 
             if (env.IsDevelopment())
             {

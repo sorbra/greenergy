@@ -121,7 +121,7 @@ namespace greenergy.chatbot_fulfillment.Models
         public DateTime time { get; set; }
         public double kilometers { get; set; }
         public Duration duration { get; set; }
-        public DateTime prognosisend { get; set; }
+        public DateTimeOffset prognosisend { get; set; }
         public double savingspercentage { get; set; }
         public double initialemissions { get; set; }
         public double optimalemissions { get; set; }

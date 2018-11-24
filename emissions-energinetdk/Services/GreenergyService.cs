@@ -7,8 +7,9 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using Greenergy.Settings;
 using Greenergy.Energinet;
-using Greenergy.Emissions.API.Client;
-using Greenergy.Emissions.API.Client.Models;
+using System.Net.Http;
+using Greenergy.Emissions.API;
+using System.Linq;
 
 namespace Greenergy.Services
 {
@@ -18,24 +19,40 @@ namespace Greenergy.Services
         private readonly ILogger _logger;
         private readonly IApplicationLifetime _applicationLifetime;
         private readonly IEnerginetAPI _energinetAPI;
-        private readonly IGreenergyAPI _greenergyAPI;
 
         private Timer _emissionsSyncTimer;
         private Timer _prognosisSyncTimer;
-
+        private HttpClient _httpClient;
+        private EmissionsClient EmissionsClient
+        {
+            get
+            {
+                var client = new EmissionsClient(_httpClient);
+                client.BaseUrl = _config.Value.EmissionsServiceBaseURL;
+                return client;
+            }
+        }
+        private PrognosisClient PrognosisClient
+        {
+            get
+            {
+                var client = new PrognosisClient(_httpClient);
+                client.BaseUrl = _config.Value.EmissionsServiceBaseURL;
+                return client;
+            }
+        }
         public GreenergyService(
             IOptions<ApplicationSettings> config,
             IApplicationLifetime applicationLifetime,
             ILogger<GreenergyService> logger,
-            IEnerginetAPI energinetAPI,
-            IGreenergyAPI greenergyAPI
+            IEnerginetAPI energinetAPI
             )
         {
             _config = config;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
             _energinetAPI = energinetAPI;
-            _greenergyAPI = greenergyAPI;
+            _httpClient = new HttpClient();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -59,9 +76,14 @@ namespace Greenergy.Services
         {
             try
             {
-                var noEarlierThan = await _greenergyAPI.GetMostRecentEmissionsTimeStamp();
+                var noEarlierThan = DateTimeOffset.MinValue;
+                var mostRecent = await EmissionsClient.GetMostRecentEmissionsAsync(); 
+                if (mostRecent.Count() > 0)
+                {
+                    noEarlierThan = mostRecent.First().EmissionTimeUTC;
+                }
 
-                if (noEarlierThan.CompareTo(DateTime.MinValue) == 0)
+                if (noEarlierThan.CompareTo(DateTimeOffset.MinValue) == 0)
                 {
                     noEarlierThan = _config.Value.BootstrapDate;
                 }
@@ -70,7 +92,7 @@ namespace Greenergy.Services
 
                 _logger.LogInformation("Received " + emissions.Count + " emissions records from energinet.dk that are new since " + noEarlierThan.ToString());
 
-                await _greenergyAPI.UpdateEmissions(emissions);
+                await EmissionsClient.UpdateEmissionsAsync(emissions);
             }
             catch (System.Exception ex)
             {
@@ -85,7 +107,7 @@ namespace Greenergy.Services
 
                 _logger.LogInformation("Received " + prognosis.Count + " prognosis records from energinet.dk");
 
-                await _greenergyAPI.UpdateEmissionsPrognosis(prognosis);
+                await PrognosisClient.UpdatePrognosesAsync(prognosis);
             }
             catch (System.Exception ex)
             {

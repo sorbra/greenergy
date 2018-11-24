@@ -6,8 +6,8 @@ using Greenergy.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Greenergy.Emissions.API.Server.Models.Mongo;
 using Greenergy.Emissions.API.Client.Models;
+using Greenergy.Emissions.API.Server.Models.Mongo;
 
 namespace Greenergy.Emissions.API.Server.Controllers
 {
@@ -30,7 +30,16 @@ namespace Greenergy.Emissions.API.Server.Controllers
         {
             try
             {
-                return (await _emissionsRepository.GetLatest()).ConvertAll(m => (EmissionDataDTO) m);
+                var latest = await _emissionsRepository.GetLatest();
+                if (latest != null)
+                {
+                    return latest.ConvertAll(m => (EmissionDataDTO) m);
+                }
+                else
+                {
+                    return new List<EmissionDataDTO>();
+                }
+                
             }
             catch (System.Exception ex)
             {
@@ -41,11 +50,13 @@ namespace Greenergy.Emissions.API.Server.Controllers
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
         [HttpPost]
-        public async Task<ActionResult> UpdateEmissions([FromBody] List<EmissionDataMongo> emissions)
+        public async Task<ActionResult> UpdateEmissions([FromBody] List<EmissionDataDTO> emissions)
         {
             try
             {
-                await _emissionsRepository.UpdateEmissionData(emissions);
+                await _emissionsRepository.UpdateEmissionData(
+                    emissions.Select(edto => new EmissionDataMongo( edto.Emission, edto.EmissionTimeUTC.UtcDateTime, edto.Region)).ToList()
+                );
 
                 _logger.LogDebug($"Received {emissions.Count} EmissionData elements");
 

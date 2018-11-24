@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/emissions-energinetdk.csproj"
+                "${workspaceFolder}/testclient.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

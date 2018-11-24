@@ -25,10 +25,10 @@ namespace Greenergy.Database
             foreach (var pg in prognoses)
             {
                 var filter = Builders<PrognosisDataMongo>.Filter.Eq(pgx => pgx.Region, pg.Region)
-                           & Builders<PrognosisDataMongo>.Filter.Eq(pgx => pgx.TimeStampUTC, pg.TimeStampUTC);
+                           & Builders<PrognosisDataMongo>.Filter.Eq(pgx => pgx.EmissionTimeUTC, pg.EmissionTimeUTC);
                 var update = Builders<PrognosisDataMongo>.Update
                                 .Set(pgx => pgx.Emission, pg.Emission)
-                                .CurrentDate(pgx => pgx.CreatedOn);
+                                .Set(pgx => pgx.UpdatedTimeUTC, DateTime.UtcNow);
                 var options = new UpdateOptions();
                 options.IsUpsert = true;
                 try
@@ -43,27 +43,27 @@ namespace Greenergy.Database
             }
         }
 
-        public async Task<ConsumptionInfoMongo> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThan, DateTime finishNoLaterThan)
+        public async Task<ConsumptionInfoMongo> OptimalConsumptionTime(int consumptionMinutes, string consumptionRegion, DateTime startNoEarlierThanUTC, DateTime finishNoLaterThanUTC)
         {
-            if (startNoEarlierThan.Equals(DateTime.MinValue))
+            if (startNoEarlierThanUTC.Equals(DateTime.MinValue))
             {
-                startNoEarlierThan = DateTime.Now.ToUniversalTime();
+                startNoEarlierThanUTC = DateTime.UtcNow;
             }
             else
             {
-                startNoEarlierThan = startNoEarlierThan.ToUniversalTime();
+                startNoEarlierThanUTC = startNoEarlierThanUTC;
             }
 
-            if (finishNoLaterThan.Equals(DateTime.MinValue)) 
+            if (finishNoLaterThanUTC.Equals(DateTime.MinValue)) 
             {
-                finishNoLaterThan = DateTime.MaxValue.ToUniversalTime();
+                finishNoLaterThanUTC = DateTime.MaxValue.ToUniversalTime();
             }
 
             var prognoses = await _context.PrognosisCollection
-                    .Find(p => (p.TimeStampUTC.CompareTo(startNoEarlierThan) >= 0)
-                              && p.TimeStampUTC.CompareTo(finishNoLaterThan) < 0
+                    .Find(p => (p.EmissionTimeUTC.CompareTo(startNoEarlierThanUTC) >= 0)
+                              && p.EmissionTimeUTC.CompareTo(finishNoLaterThanUTC) < 0
                               && p.Region.Equals(consumptionRegion))
-                    .SortBy(p => p.TimeStampUTC)
+                    .SortBy(p => p.EmissionTimeUTC)
                     .ToListAsync();
 
             if (prognoses == null || prognoses.Count() == 0)
@@ -71,8 +71,8 @@ namespace Greenergy.Database
                 throw new NotSupportedException("No prognosis data");
             }
 
-            var lastPrognosisTime = prognoses.Last().TimeStampUTC;
-            var minutesLeft = (int)(lastPrognosisTime - DateTime.Now).TotalMinutes;
+            var lastPrognosisTime = prognoses.Last().EmissionTimeUTC;
+            var minutesLeft = (int)(lastPrognosisTime - DateTimeOffset.Now).TotalMinutes;
             if (minutesLeft < consumptionMinutes || consumptionMinutes == 0)
             {
                 // not enough prognosis data to look consumptionMinutes into the future
@@ -104,16 +104,16 @@ namespace Greenergy.Database
 
             return new ConsumptionInfoMongo
             {
-                firstEmissions = initialEmissions / windowSize,
-                optimalEmissions = minTotalEmissions / windowSize,
-                lastEmissions = curTotalEmissions / windowSize,
-                firstConsumptionStartUTC = prognoses.First().TimeStampUTC,
-                optimalConsumptionStartUTC = prognoses[inxMinStart].TimeStampUTC,
-                lastConsumptionStartUTC = prognoses[inxStart].TimeStampUTC,
-                consumptionMinutes = consumptionMinutes,
-                consumptionRegion = consumptionRegion,
-                prognosisUpdateTimeUTC = prognoses.First().CreatedOn,
-                lastPrognosisTimeUTC = prognoses.Last().TimeStampUTC
+                FirstEmissions = initialEmissions / windowSize,
+                OptimalEmissions = minTotalEmissions / windowSize,
+                LastEmissions = curTotalEmissions / windowSize,
+                FirstConsumptionStartUTC = prognoses.First().EmissionTimeUTC,
+                OptimalConsumptionStartUTC = prognoses[inxMinStart].EmissionTimeUTC,
+                LastConsumptionStartUTC = prognoses[inxStart].EmissionTimeUTC,
+                ConsumptionMinutes = consumptionMinutes,
+                ConsumptionRegion = consumptionRegion,
+                PrognosisUpdateTimeUTC = prognoses.First().RecordedTimeUTC,
+                LastPrognosisTimeUTC = prognoses.Last().EmissionTimeUTC
             };
         }
 

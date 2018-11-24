@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
-using Greenergy.Emissions.API.Client.Models;
-using Greenergy.Emissions.API.Client;
+using Greenergy.Emissions.API;
+using System.Net.Http;
 
 namespace greenergy.chatbot_fulfillment.Controllers
 {
@@ -20,16 +20,33 @@ namespace greenergy.chatbot_fulfillment.Controllers
         private const float kilometersPerKwh = 5f;
         private const float kwhPerHour = 10f;
 
-        private IGreenergyAPI _greenergyAPI;
         private ILogger<FulfillmentController> _logger;
         private IOptions<FulfillmentSettings> _config;
+        private HttpClient _httpClient;
         private TimeZoneInfo _copenhagenTimeZoneInfo;
-
-        public FulfillmentController(IGreenergyAPI greenergyAPI, ILogger<FulfillmentController> logger, IOptions<FulfillmentSettings> config)
+        private EmissionsClient EmissionsClient
         {
-            _greenergyAPI = greenergyAPI;
+            get
+            {
+                var client = new EmissionsClient(_httpClient);
+                client.BaseUrl = _config.Value.EmissionsServiceBaseURL;
+                return client;
+            }
+        }
+        private PrognosisClient PrognosisClient
+        {
+            get
+            {
+                var client = new PrognosisClient(_httpClient);
+                client.BaseUrl = _config.Value.EmissionsServiceBaseURL;
+                return client;
+            }
+        }
+        public FulfillmentController(ILogger<FulfillmentController> logger, IOptions<FulfillmentSettings> config)
+        {
             _logger = logger;
             _config = config;
+            _httpClient = new HttpClient();
 
             try
             {
@@ -43,11 +60,11 @@ namespace greenergy.chatbot_fulfillment.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<EmissionDataDTO>>> Getemissions()
+        public async Task<ActionResult<ICollection<EmissionDataDTO>>> Getemissions()
         {
             try
             {
-                return await _greenergyAPI.GetMostRecentEmissions();
+                return new ActionResult<ICollection<EmissionDataDTO>>(await EmissionsClient.GetMostRecentEmissionsAsync());
             }
             catch (System.Exception ex)
             {
@@ -130,7 +147,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
         {
             try
             {
-                var currentEmission = (await _greenergyAPI.GetMostRecentEmissions())[0].Emission;
+                var currentEmission = (await EmissionsClient.GetMostRecentEmissionsAsync()).FirstOrDefault().Emission;
 
                 DialogFlowResponseDTO response = new DialogFlowResponseDTO();
                 response.fulfillmentText = request.queryResult.fulfillmentText.Replace("$co2perkwh", currentEmission.ToString());
@@ -148,9 +165,11 @@ namespace greenergy.chatbot_fulfillment.Controllers
         {
             try
             {
-                var response = new DialogFlowResponseDTO();
-                response.outputContexts = request.queryResult.outputContexts;
-                response.fulfillmentText = request.queryResult.fulfillmentText;
+                var response = new DialogFlowResponseDTO() 
+                {
+                    outputContexts = request.queryResult.outputContexts,
+                    fulfillmentText = request.queryResult.fulfillmentText
+                };
                 return response;
             }
             catch (Exception ex)
@@ -197,7 +216,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
                     }
                 }
 
-                var best = await _greenergyAPI.OptimalFutureConsumptionTime(
+                var best = await PrognosisClient.OptimalConsumptionTimeAsync(
                     consumptionMinutes: parameters.duration.toMinutes(),
                     consumptionRegion: "DK1",
                     startNoEarlierThan: nowUTC,
@@ -209,36 +228,36 @@ namespace greenergy.chatbot_fulfillment.Controllers
                     DialogFlowResponseDTO response = new DialogFlowResponseDTO();
                     response.outputContexts = request.queryResult.outputContexts;
 
-                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.optimalConsumptionStartUTC, _copenhagenTimeZoneInfo);
-                    var prognosisEnd = TimeZoneInfo.ConvertTime(best.lastPrognosisTimeUTC, _copenhagenTimeZoneInfo).AddMinutes(5);
-                    var prognosisLookaheadHours = Math.Round((best.lastPrognosisTimeUTC - nowUTC).TotalHours, 0);
+                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.OptimalConsumptionStartUTC, _copenhagenTimeZoneInfo);
+                    var prognosisEnd = TimeZoneInfo.ConvertTime(best.LastPrognosisTimeUTC, _copenhagenTimeZoneInfo).AddMinutes(5);
+                    var prognosisLookaheadHours = Math.Round((best.LastPrognosisTimeUTC - nowUTC).TotalHours, 0);
                     var finishNoLaterThan = TimeZoneInfo.ConvertTime(finishNoLaterThanUTC, _copenhagenTimeZoneInfo);
 
                     var lang = request.queryResult.languageCode;
                     var culture = CultureInfo.CreateSpecificCulture(lang);
 
-                    float savingsPercentage = (best.firstEmissions - best.optimalEmissions) / best.firstEmissions;
+                    double savingsPercentage = (best.FirstEmissions - best.OptimalEmissions) / best.FirstEmissions;
 
                     OutputContext ctx = response.outputContexts
                                         .Find(oc => oc.name.EndsWith("consumeelectricity-followup"));
-                    ctx.parameters.prognosisend = best.lastPrognosisTimeUTC;
+                    ctx.parameters.prognosisend = best.LastPrognosisTimeUTC;
                     ctx.parameters.savingspercentage = (float)Math.Round(savingsPercentage * 100, 0);
-                    ctx.parameters.optimalemissions = Math.Round(best.optimalEmissions,0);
-                    ctx.parameters.initialemissions = Math.Round(best.firstEmissions,0);
-                    ctx.parameters.lastEmissions = Math.Round(best.lastEmissions,0);
+                    ctx.parameters.optimalemissions = Math.Round(best.OptimalEmissions, 0);
+                    ctx.parameters.initialemissions = Math.Round(best.FirstEmissions, 0);
+                    ctx.parameters.lastEmissions = Math.Round(best.LastEmissions, 0);
                     ctx.parameters.optimalconsumptionstart = optimalConsumptionStart.ToString("dddd HH:mm", culture);
                     ctx.parameters.finishnolaterthan = finishNoLaterThan.ToString("dddd HH:mm", culture);
                     ctx.parameters.readableduration = parameters.duration.toReadableString();
-                    ctx.parameters.waitinghours = Math.Round((best.optimalConsumptionStartUTC - nowUTC).TotalHours,0);
+                    ctx.parameters.waitinghours = Math.Round((best.OptimalConsumptionStartUTC - nowUTC).TotalHours, 0);
 
                     // ctx.parameters.test1 = optimalConsumptionStart.ToUniversalTime().ToString("o");
                     // ctx.parameters.test2 = best.optimalConsumptionStart.ToUniversalTime().ToString("o");
 
-                    if (ctx.parameters.savingspercentage < 2) 
+                    if (ctx.parameters.savingspercentage < 2)
                     {
                         response.fulfillmentText = "Now is a good time! Do you want to know why?"
-                                    .Replace("$device",ctx.parameters.devicetype)
-                                    .Replace("$duration",parameters.duration.toReadableString());
+                                    .Replace("$device", ctx.parameters.devicetype)
+                                    .Replace("$duration", parameters.duration.toReadableString());
                     }
                     else
                     {

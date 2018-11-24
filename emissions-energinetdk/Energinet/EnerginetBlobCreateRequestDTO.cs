@@ -14,7 +14,7 @@ namespace Greenergy.Energinet
 
     public class EnerginetBlobCreateRequestDTO
     {
-        public static EnerginetBlobCreateRequestDTO NewEmissionsRequest(DateTime noEarlierThan)
+        public static EnerginetBlobCreateRequestDTO NewEmissionsRequest(DateTimeOffset noEarlierThan)
         {
             var request = new EnerginetBlobCreateRequestDTO();
 
@@ -41,7 +41,7 @@ namespace Greenergy.Energinet
             {
                 name = "Minutes5UTC",
                 @operator = ">=",
-                value = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm")
+                value = DateTimeOffset.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm")
             };
             request.filters.Add(filter);
 

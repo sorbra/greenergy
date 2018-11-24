@@ -12,8 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Greenergy.Settings;
 using Greenergy.Services;
 using Greenergy.Energinet;
-using Greenergy.Emissions.API.Client;
-using Greenergy.Emissions.API.Client.Models;
+using Greenergy.Emissions.API;
 
 namespace Greenergy
 {
@@ -48,9 +47,7 @@ namespace Greenergy
                     services.AddLogging();
                     var ctx = hostContext.Configuration.GetSection("application");
                     services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
-                    services.Configure<EmissionsClientSettings>(hostContext.Configuration.GetSection("greenergyapi"));
 
-                    services.AddTransient<IGreenergyAPI, GreenergyAPIClient>();
                     services.AddTransient<IEnerginetAPI, EnerginetAPI>();
 
                     services.AddHostedService<GreenergyService>();
