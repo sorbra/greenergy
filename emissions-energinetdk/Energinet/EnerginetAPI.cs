@@ -7,16 +7,22 @@ using System.Threading.Tasks;
 using Greenergy.Settings;
 using Microsoft.Extensions.Options;
 using Greenergy.Emissions.API;
+using Microsoft.Extensions.Logging;
 
 namespace Greenergy.Energinet
 {
     public class EnerginetAPI : IEnerginetAPI
     {
         private IOptions<ApplicationSettings> _config;
+        private ILogger<EnerginetAPI> _logger;
 
-        public EnerginetAPI(IOptions<ApplicationSettings> config)
+        public EnerginetAPI(
+            IOptions<ApplicationSettings> config,
+            ILogger<EnerginetAPI> logger
+        )
         {
             _config = config;
+            _logger = logger;
         }
         public async Task<List<EmissionDataDTO>> GetRecentEmissions(DateTimeOffset noEarlierThan)
         {
@@ -24,7 +30,7 @@ namespace Greenergy.Energinet
             var request = EnerginetBlobCreateRequestDTO.NewEmissionsRequest(noEarlierThan);
             return await EnerginetGet(request);
         }
-        
+
         public async Task<List<EmissionDataDTO>> GetCurrentEmissionsPrognosis()
         {
             var request = EnerginetBlobCreateRequestDTO.NewPrognosisRequest();
@@ -57,14 +63,21 @@ namespace Greenergy.Energinet
                         foreach (var record in emissionsJsonResponse.records)
                         {
                             results.Add(
-                                new EmissionDataDTO() {
+                                new EmissionDataDTO()
+                                {
                                     Emission = Int32.Parse(record[3]),
                                     EmissionTimeUTC = DateTimeOffset.Parse(record[0]),
                                     Region = record[2]
-                            });
+                                });
                         }
                         return results;
                     }
+                }
+                else
+                {
+                    string message = $"Failed to retrieve emissions data from Energinet. StatusCode={blobCreateResponse.StatusCode}, Reason={blobCreateResponse.ReasonPhrase}";
+                    _logger.LogCritical(message);
+                    throw new ApplicationException(message);
                 }
                 return null;
             }

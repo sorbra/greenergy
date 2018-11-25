@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Greenergy.Emissions.API.Server.Models.Mongo;
 using Greenergy.Emissions.API.Client.Models;
+using Greenergy.Emissions.MessageProviders;
 
 namespace Greenergy.Emissions.API.Server.Controllers
 {
@@ -19,12 +20,18 @@ namespace Greenergy.Emissions.API.Server.Controllers
         private ILogger<PrognosisController> _logger;
         private IPrognosisRepository _prognosisRepository;
         private IEmissionsRepository _emissionsRepository;
+        private IPrognosisMessageProvider _messageProvider;
 
-        public PrognosisController (ILogger<PrognosisController> logger, IPrognosisRepository prognosisRepository, IEmissionsRepository emissionsRepository)
+        public PrognosisController (
+            ILogger<PrognosisController> logger, 
+            IPrognosisRepository prognosisRepository, 
+            IEmissionsRepository emissionsRepository,
+            IPrognosisMessageProvider messageProvider)
         {
             _logger = logger;
             _prognosisRepository = prognosisRepository;
             _emissionsRepository = emissionsRepository;
+            _messageProvider = messageProvider;
         }
 
         // Saves EmissionData  to the database. Existing data with same timestamp and region will get overwritten.
@@ -34,6 +41,8 @@ namespace Greenergy.Emissions.API.Server.Controllers
             await _prognosisRepository.UpdatePrognosisData(
                     prognoses.Select(edto => new PrognosisDataMongo( edto.Emission, edto.EmissionTimeUTC.UtcDateTime, edto.Region)).ToList()
             );
+
+            _messageProvider.OnNewPrognosisData(prognoses);
 
             _logger.LogDebug($"Received {prognoses.Count} EmissionData elements");
 

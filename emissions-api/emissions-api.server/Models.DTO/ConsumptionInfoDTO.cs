@@ -14,5 +14,6 @@ namespace Greenergy.Emissions.API.Client.Models
         public string ConsumptionRegion { get; set; }
         public DateTimeOffset PrognosisUpdateTimeUTC { get; set; }
         public DateTimeOffset LastPrognosisTimeUTC { get; set; }
+        public int ConsumptionHours { get; internal set; }
     }
 }
