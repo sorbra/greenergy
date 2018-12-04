@@ -11,9 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-//using Swashbuckle.AspNetCore.Swagger;
 using Greenergy.Settings;
 using NSwag.AspNetCore;
+using Greenergy.Emissions.Messaging;
+using Greenergy.Emissions.Optimization;
 
 namespace Greenergy.Emissions.API.Server
 {
@@ -36,8 +37,6 @@ namespace Greenergy.Emissions.API.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            _logger.LogInformation("ConfigureServices start");
-
             services.Configure<MongoSettings>(ms =>
             {
                 ms.ConnectionString
@@ -51,6 +50,8 @@ namespace Greenergy.Emissions.API.Server
             services.AddTransient<IEmissionsRepository, EmissionsRepository>();
             services.AddTransient<IPrognosisRepository, PrognosisRepository>();
             services.AddTransient<IEmissionDataContext, EmissionDataContext>();
+            services.AddTransient<IConsumptionOptimizer, ConsumptionOptimizer>();
+            services.AddTransient<IPrognosisMessageSink, PrognosisMessageSink>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -60,8 +61,6 @@ namespace Greenergy.Emissions.API.Server
                 document.Description = "API to retrieve CO2 emissions data related to electricity production.";
                 document.Title = "Greenergy Emissions Data API";
             });
-
-            _logger.LogInformation("ConfigureServices end");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

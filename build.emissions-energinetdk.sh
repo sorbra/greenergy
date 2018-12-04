@@ -6,5 +6,5 @@ export DOCKER_TAG_ENERGINETDK="sorbra/emissions-energinetdk:0.2.0"
 docker build -t $DOCKER_TAG_ENERGINETDK -f ./emissions-energinetdk/Dockerfile .
 
 # Push container to Docker Hub
-docker login -u sorbra
+# docker login -u sorbra
 docker push "$DOCKER_TAG_ENERGINETDK"

@@ -216,39 +216,42 @@ namespace greenergy.chatbot_fulfillment.Controllers
                     }
                 }
 
-                var best = await PrognosisClient.OptimalConsumptionTimeAsync(
-                    consumptionMinutes: parameters.duration.toMinutes(),
-                    consumptionRegion: "DK1",
-                    startNoEarlierThan: nowUTC,
-                    finishNoLaterThan: finishNoLaterThanUTC
-                );
+                var prognosis = await PrognosisClient.OptimalConsumptionTimeAsync("DK1", parameters.duration.toHours(), DateTimeOffset.UtcNow.ToString("o"), finishNoLaterThanUTC.ToString("o"));
 
-                if (best != null)
+                // var best = await PrognosisClient.OptimalConsumptionTimeAsync(
+
+                //     consumptionMinutes: parameters.duration.toMinutes(),
+                //     consumptionRegion: "DK1",
+                //     startNoEarlierThan: nowUTC,
+                //     finishNoLaterThan: finishNoLaterThanUTC
+                // );
+
+                if (prognosis != null)
                 {
                     DialogFlowResponseDTO response = new DialogFlowResponseDTO();
                     response.outputContexts = request.queryResult.outputContexts;
 
-                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(best.OptimalConsumptionStartUTC, _copenhagenTimeZoneInfo);
-                    var prognosisEnd = TimeZoneInfo.ConvertTime(best.LastPrognosisTimeUTC, _copenhagenTimeZoneInfo).AddMinutes(5);
-                    var prognosisLookaheadHours = Math.Round((best.LastPrognosisTimeUTC - nowUTC).TotalHours, 0);
+                    var optimalConsumptionStart = TimeZoneInfo.ConvertTime(prognosis.Best.StartUTC, _copenhagenTimeZoneInfo);
+                    var prognosisEnd = TimeZoneInfo.ConvertTime(prognosis.PrognosisEndUTC, _copenhagenTimeZoneInfo).AddMinutes(5);
+                    var prognosisLookaheadHours = Math.Round((prognosis.PrognosisEndUTC - nowUTC).TotalHours, 0);
                     var finishNoLaterThan = TimeZoneInfo.ConvertTime(finishNoLaterThanUTC, _copenhagenTimeZoneInfo);
 
                     var lang = request.queryResult.languageCode;
                     var culture = CultureInfo.CreateSpecificCulture(lang);
 
-                    double savingsPercentage = (best.FirstEmissions - best.OptimalEmissions) / best.FirstEmissions;
+                    double savingsPercentage = (prognosis.Earliest.Emissions - prognosis.Best.Emissions) / prognosis.Earliest.Emissions;
 
                     OutputContext ctx = response.outputContexts
                                         .Find(oc => oc.name.EndsWith("consumeelectricity-followup"));
-                    ctx.parameters.prognosisend = best.LastPrognosisTimeUTC;
+                    ctx.parameters.prognosisend = prognosis.PrognosisEndUTC;
                     ctx.parameters.savingspercentage = (float)Math.Round(savingsPercentage * 100, 0);
-                    ctx.parameters.optimalemissions = Math.Round(best.OptimalEmissions, 0);
-                    ctx.parameters.initialemissions = Math.Round(best.FirstEmissions, 0);
-                    ctx.parameters.lastEmissions = Math.Round(best.LastEmissions, 0);
+                    ctx.parameters.optimalemissions = Math.Round(prognosis.Best.Emissions, 0);
+                    ctx.parameters.initialemissions = Math.Round(prognosis.Earliest.Emissions, 0);
+                    ctx.parameters.lastEmissions = Math.Round(prognosis.Latest.Emissions, 0);
                     ctx.parameters.optimalconsumptionstart = optimalConsumptionStart.ToString("dddd HH:mm", culture);
                     ctx.parameters.finishnolaterthan = finishNoLaterThan.ToString("dddd HH:mm", culture);
                     ctx.parameters.readableduration = parameters.duration.toReadableString();
-                    ctx.parameters.waitinghours = Math.Round((best.OptimalConsumptionStartUTC - nowUTC).TotalHours, 0);
+                    ctx.parameters.waitinghours = Math.Round((prognosis.Best.StartUTC - nowUTC).TotalHours, 0);
 
                     // ctx.parameters.test1 = optimalConsumptionStart.ToUniversalTime().ToString("o");
                     // ctx.parameters.test2 = best.optimalConsumptionStart.ToUniversalTime().ToString("o");
@@ -283,7 +286,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message, null);
+                _logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -342,7 +345,7 @@ namespace greenergy.chatbot_fulfillment.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message, null);
+                _logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

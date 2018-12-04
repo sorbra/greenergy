@@ -114,14 +114,14 @@ namespace Greenergy.Emissions.API
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileResponse> UpdateEmissionsAsync(System.Collections.Generic.IEnumerable<EmissionDataMongo> emissions)
+        public System.Threading.Tasks.Task<FileResponse> UpdateEmissionsAsync(System.Collections.Generic.IEnumerable<EmissionDataDTO> emissions)
         {
             return UpdateEmissionsAsync(emissions, System.Threading.CancellationToken.None);
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<FileResponse> UpdateEmissionsAsync(System.Collections.Generic.IEnumerable<EmissionDataMongo> emissions, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> UpdateEmissionsAsync(System.Collections.Generic.IEnumerable<EmissionDataDTO> emissions, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Emissions");
@@ -251,14 +251,14 @@ namespace Greenergy.Emissions.API
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileResponse> UpdatePrognosesAsync(System.Collections.Generic.IEnumerable<PrognosisDataMongo> prognoses)
+        public System.Threading.Tasks.Task<FileResponse> UpdatePrognosesAsync(System.Collections.Generic.IEnumerable<EmissionDataDTO> prognoses)
         {
             return UpdatePrognosesAsync(prognoses, System.Threading.CancellationToken.None);
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<FileResponse> UpdatePrognosesAsync(System.Collections.Generic.IEnumerable<PrognosisDataMongo> prognoses, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> UpdatePrognosesAsync(System.Collections.Generic.IEnumerable<EmissionDataDTO> prognoses, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Prognosis");
@@ -321,24 +321,24 @@ namespace Greenergy.Emissions.API
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<ConsumptionInfoDTO> OptimalConsumptionTimeAsync(int? consumptionMinutes, string consumptionRegion, System.DateTimeOffset? startNoEarlierThan, System.DateTimeOffset? finishNoLaterThan)
+        public System.Threading.Tasks.Task<OptimalConsumptionPrognosis> OptimalConsumptionTimeAsync(string region, int? hours, System.DateTimeOffset? startNoEarlierThan, System.DateTimeOffset? finishNoLaterThan)
         {
-            return OptimalConsumptionTimeAsync(consumptionMinutes, consumptionRegion, startNoEarlierThan, finishNoLaterThan, System.Threading.CancellationToken.None);
+            return OptimalConsumptionTimeAsync(region, hours, startNoEarlierThan, finishNoLaterThan, System.Threading.CancellationToken.None);
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<ConsumptionInfoDTO> OptimalConsumptionTimeAsync(int? consumptionMinutes, string consumptionRegion, System.DateTimeOffset? startNoEarlierThan, System.DateTimeOffset? finishNoLaterThan, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<OptimalConsumptionPrognosis> OptimalConsumptionTimeAsync(string region, int? hours, System.DateTimeOffset? startNoEarlierThan, System.DateTimeOffset? finishNoLaterThan, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Prognosis/optimize?");
-            if (consumptionMinutes != null) 
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Prognosis/suggest?");
+            if (region != null) 
             {
-                urlBuilder_.Append("consumptionMinutes=").Append(System.Uri.EscapeDataString(ConvertToString(consumptionMinutes, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append("region=").Append(System.Uri.EscapeDataString(ConvertToString(region, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (consumptionRegion != null) 
+            if (hours != null) 
             {
-                urlBuilder_.Append("consumptionRegion=").Append(System.Uri.EscapeDataString(ConvertToString(consumptionRegion, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append("hours=").Append(System.Uri.EscapeDataString(ConvertToString(hours, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             if (startNoEarlierThan != null) 
             {
@@ -379,10 +379,10 @@ namespace Greenergy.Emissions.API
                         if (status_ == "200") 
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
-                            var result_ = default(ConsumptionInfoDTO); 
+                            var result_ = default(OptimalConsumptionPrognosis); 
                             try
                             {
-                                result_ = Newtonsoft.Json.JsonConvert.DeserializeObject<ConsumptionInfoDTO>(responseData_, _settings.Value);
+                                result_ = Newtonsoft.Json.JsonConvert.DeserializeObject<OptimalConsumptionPrognosis>(responseData_, _settings.Value);
                                 return result_; 
                             } 
                             catch (System.Exception exception_) 
@@ -397,7 +397,7 @@ namespace Greenergy.Emissions.API
                             throw new SwaggerException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
                         }
             
-                        return default(ConsumptionInfoDTO);
+                        return default(OptimalConsumptionPrognosis);
                     }
                     finally
                     {
@@ -455,14 +455,14 @@ namespace Greenergy.Emissions.API
         [Newtonsoft.Json.JsonProperty("emission", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Emission { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("timeStampUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset TimeStampUTC { get; set; }
+        [Newtonsoft.Json.JsonProperty("emissionTimeUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset EmissionTimeUTC { get; set; }
     
         [Newtonsoft.Json.JsonProperty("region", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Region { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("createdOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset CreatedOn { get; set; }
+        [Newtonsoft.Json.JsonProperty("recordedTimeUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset RecordedTimeUTC { get; set; }
     
         public string ToJson() 
         {
@@ -477,132 +477,58 @@ namespace Greenergy.Emissions.API
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.12.2.0 (Newtonsoft.Json v11.0.0.0)")]
-    public partial class EmissionDataMongo 
+    public partial class OptimalConsumptionPrognosis 
     {
-        [Newtonsoft.Json.JsonProperty("internalId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public ObjectId InternalId { get; set; } = new ObjectId();
-    
-        [Newtonsoft.Json.JsonProperty("emission", Required = Newtonsoft.Json.Required.Always)]
-        public int Emission { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("timeStampUTC", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.DateTimeOffset TimeStampUTC { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("region", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
+        [Newtonsoft.Json.JsonProperty("region", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Region { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("createdOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset CreatedOn { get; set; }
+        [Newtonsoft.Json.JsonProperty("hoursOfConsumption", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int HoursOfConsumption { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("prognosisEndUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset PrognosisEndUTC { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("earliest", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public PredictedConsumption Earliest { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("latest", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public PredictedConsumption Latest { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("best", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public PredictedConsumption Best { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("prognosisTimeUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset PrognosisTimeUTC { get; set; }
     
         public string ToJson() 
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static EmissionDataMongo FromJson(string data)
+        public static OptimalConsumptionPrognosis FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<EmissionDataMongo>(data);
-        }
-    
-    }
-    
-    /// <summary>Represents an ObjectId (see also BsonObjectId).</summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.12.2.0 (Newtonsoft.Json v11.0.0.0)")]
-    public partial class ObjectId 
-    {
-        /// <summary>Gets the timestamp.</summary>
-        [Newtonsoft.Json.JsonProperty("timestamp", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Timestamp { get; set; }
-    
-        /// <summary>Gets the machine.</summary>
-        [Newtonsoft.Json.JsonProperty("machine", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Machine { get; set; }
-    
-        /// <summary>Gets the PID.</summary>
-        [Newtonsoft.Json.JsonProperty("pid", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Pid { get; set; }
-    
-        /// <summary>Gets the increment.</summary>
-        [Newtonsoft.Json.JsonProperty("increment", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Increment { get; set; }
-    
-        /// <summary>Gets the creation time (derived from the timestamp).</summary>
-        [Newtonsoft.Json.JsonProperty("creationTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset CreationTime { get; set; }
-    
-        public string ToJson() 
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-        
-        public static ObjectId FromJson(string data)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<ObjectId>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<OptimalConsumptionPrognosis>(data);
         }
     
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.12.2.0 (Newtonsoft.Json v11.0.0.0)")]
-    public partial class PrognosisDataMongo : EmissionDataMongo
+    public partial class PredictedConsumption 
     {
-        [Newtonsoft.Json.JsonProperty("updatedOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset UpdatedOn { get; set; }
+        [Newtonsoft.Json.JsonProperty("startUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset StartUTC { get; set; }
+    
+        [Newtonsoft.Json.JsonProperty("emissions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Emissions { get; set; }
     
         public string ToJson() 
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static PrognosisDataMongo FromJson(string data)
+        public static PredictedConsumption FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<PrognosisDataMongo>(data);
-        }
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.12.2.0 (Newtonsoft.Json v11.0.0.0)")]
-    public partial class ConsumptionInfoDTO 
-    {
-        [Newtonsoft.Json.JsonProperty("firstEmissions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double FirstEmissions { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("optimalEmissions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double OptimalEmissions { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("lastEmissions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double LastEmissions { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("firstConsumptionStartUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset FirstConsumptionStartUTC { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("optimalConsumptionStartUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset OptimalConsumptionStartUTC { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("lastConsumptionStartUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset LastConsumptionStartUTC { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("consumptionMinutes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int ConsumptionMinutes { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("consumptionRegion", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string ConsumptionRegion { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("prognosisUpdateTimeUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset PrognosisUpdateTimeUTC { get; set; }
-    
-        [Newtonsoft.Json.JsonProperty("lastPrognosisTimeUTC", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset LastPrognosisTimeUTC { get; set; }
-    
-        public string ToJson() 
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-        
-        public static ConsumptionInfoDTO FromJson(string data)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<ConsumptionInfoDTO>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<PredictedConsumption>(data);
         }
     
     }

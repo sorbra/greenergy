@@ -8,5 +8,6 @@ export DOCKER_TAG_API="sorbra/emissions-api:0.2.0"
 docker build -t $DOCKER_TAG_API -f ./emissions-api.server/Dockerfile .
 
 # Push container to Docker Hub
-docker login -u sorbra
+# docker login -u sorbra
 docker push "$DOCKER_TAG_API"
+

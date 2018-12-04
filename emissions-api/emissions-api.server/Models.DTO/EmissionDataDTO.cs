@@ -19,6 +19,6 @@ namespace Greenergy.Emissions.API.Client.Models
         public DateTimeOffset EmissionTimeUTC { get; set; }
         
         public string Region { get; set; }      
-        public DateTimeOffset RecordedTimeUTC { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset RecordedTimeUTC { get; set; } = DateTimeOffset.UtcNow;
     }
 }

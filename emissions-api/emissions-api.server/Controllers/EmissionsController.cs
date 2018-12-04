@@ -38,13 +38,12 @@ namespace Greenergy.Emissions.API.Server.Controllers
                 else
                 {
                     return new List<EmissionDataDTO>();
-                }
-                
+                }                
             }
             catch (System.Exception ex)
             {
-                _logger.LogError(ex, "Exception in EmissionsController.GetMostRecentEmissions", null);
-                return null;
+                _logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -57,18 +56,14 @@ namespace Greenergy.Emissions.API.Server.Controllers
                 await _emissionsRepository.UpdateEmissionData(
                     emissions.Select(edto => new EmissionDataMongo( edto.Emission, edto.EmissionTimeUTC.UtcDateTime, edto.Region)).ToList()
                 );
-
-                _logger.LogDebug($"Received {emissions.Count} EmissionData elements");
-
-                return Ok();
-
+                _logger.LogInformation($"Received {emissions.Count} EmissionData elements");
             }
             catch (System.Exception ex)
             {
-
-                _logger.LogError(ex, "Exception in EmissionsController.UpdateEmissions", null);
+                _logger.LogError(ex, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
-            return null;
+            return Ok();
         }
     }
 }

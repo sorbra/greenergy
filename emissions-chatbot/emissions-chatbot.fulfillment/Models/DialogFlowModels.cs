@@ -148,12 +148,23 @@ namespace greenergy.chatbot_fulfillment.Models
             return -1;
         }
 
+        public int toHours()
+        {
+            if (unit.Equals("min"))
+                return (int) Math.Round(amount/60);
+            else if (unit.Equals("h"))
+                return (int)amount;
+            else if (unit.Equals("day"))
+                return (int) Math.Round(amount*24);
+            return -1;
+        }
+
         public string toReadableString()
         {
             if (unit.Equals("min"))
                 return $"{amount} minutes";
             else if (unit.Equals("h"))
-                if (amount==1) return "hour";
+                if (amount == 1) return "hour";
                 else return $"{amount} hours";
             else if (unit.Equals("day"))
                 return $"{amount} days";
