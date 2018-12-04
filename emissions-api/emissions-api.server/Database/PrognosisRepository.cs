@@ -49,10 +49,6 @@ namespace Greenergy.Database
             {
                 startNoEarlierThanUTC = DateTime.UtcNow;
             }
-            else
-            {
-                startNoEarlierThanUTC = startNoEarlierThanUTC;
-            }
 
             if (finishNoLaterThanUTC.Equals(DateTime.MinValue)) 
             {
