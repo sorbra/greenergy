@@ -10,18 +10,12 @@ namespace Greenergy.Tesla
         static public string OAUTH_TOKEN_PATH = OWNER_API_BASE_URI + "/oauth/token";
         static public string VEHICLES_API_BASE_URI = OWNER_API_BASE_URI + "/api/1/vehicles";
         static public string CHARGESTATE_PATH = VEHICLES_API_BASE_URI + "/{id}/data_request/charge_state";
-        static public string COMMAND_PATH = OWNER_API_BASE_URI + "/{id}/command/{command}";
+        static public string COMMAND_PATH = VEHICLES_API_BASE_URI + "/{id}/command/{command}";
         static public HttpClient GetClient()
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "Greenergy");
             return client;
-        }
-        static public string CommandURL(TeslaVehicle vehicle, string command)
-        {
-            return COMMAND_PATH
-                        .Replace("{id}", vehicle.Id)
-                        .Replace("{command}", command);
         }
     }
 }

@@ -15,6 +15,8 @@ namespace Greenergy.Tesla
         string Email;
         string AccessToken;
         DateTime TokenExpiry;
+        string RefreshToken;
+
         public HttpClient Client { get; set; }
         public TeslaOwner(string email)
         {
@@ -51,6 +53,7 @@ namespace Greenergy.Tesla
             );
 
             AccessToken = token.AccessToken;
+            RefreshToken = token.ResfreshToken;
             TokenExpiry = token.ExpiresAt;
 
             Client.DefaultRequestHeaders.Add("Authorization","Bearer " + AccessToken);

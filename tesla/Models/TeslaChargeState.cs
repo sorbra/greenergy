@@ -6,5 +6,6 @@ namespace Greenergy.Tesla
         public int BatteryLevel;
         public decimal TimeToFullCharge;
         public bool ScheduledChargingPending;
+        public int ChargeLimit;
     }
 }

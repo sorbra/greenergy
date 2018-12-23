@@ -16,9 +16,10 @@ namespace Greenergy.Tesla
             
             var chargeState = await myTesla.GetChargeStateAsync();
 
-            bool limitset = await myTesla.SetChargeLimit(60);
+//            bool limitset = await myTesla.SetChargeLimit(90);
 
             bool charging = await myTesla.StartCharge();
+//            bool charging = await myTesla.StopCharge();
             
 
             // var response = await hclient.GetAsync(client.BaseUri+$"/api/1/vehicles/{vehicle.Id}/data_request/charge_state");

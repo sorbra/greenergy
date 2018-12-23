@@ -10,8 +10,8 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.1/greenergy.tesla.dll",
-            "args": ["sorbra@gmail.com", "password"],
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.1/tesla.dll",
+            "args": ["sorbra@gmail.com", ""],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
             "console": "internalConsole",

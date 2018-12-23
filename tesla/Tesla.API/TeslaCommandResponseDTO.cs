@@ -4,9 +4,11 @@ using Newtonsoft.Json;
 namespace Greenergy.Tesla
 {
     [JsonObject]
-    class TeslaCommandResponseDTO
+    class TeslaCommandResponseType
     {
-        [JsonProperty("response")]
-        public bool response;
+        [JsonProperty("reason")]
+        public string reason;
+        [JsonProperty("result")]
+        public bool result;
     }
 }

@@ -24,22 +24,25 @@ namespace Greenergy.Tesla
                 throw new Exception($"Failed to get Tesla ChargeState. StatusCode={response.StatusCode}, Reason={response.ReasonPhrase}");
             }
 
-            var cs = JsonConvert.DeserializeObject<TeslaChargingStateResponseDTO>(
-                await response.Content.ReadAsStringAsync()
+            var responseStr = await response.Content.ReadAsStringAsync();
+
+            var cs = JsonConvert.DeserializeObject<TeslaCommandResponseDTO<TeslaChargeStateResponseType>>(
+                responseStr
             );
 
             var chargeState = new TeslaChargeState()
             {
-                ChargingState = cs.ChargeStateDTO.ChargingState,
-                BatteryLevel = cs.ChargeStateDTO.BatteryLevel,
-                TimeToFullCharge = cs.ChargeStateDTO.TimeToFullCharge,
-                ScheduledChargingPending = cs.ChargeStateDTO.ScheduledChargingPending
+                ChargingState = cs.response.ChargingState,
+                BatteryLevel = cs.response.BatteryLevel,
+                TimeToFullCharge = cs.response.TimeToFullCharge,
+                ScheduledChargingPending = cs.response.ScheduledChargingPending,
+                ChargeLimit = cs.response.ChargeLimit
             };
 
             return chargeState;
         }
 
-        protected async Task<ResponseDTOType> PostCommand<ResponseDTOType>(string command, object requestBody)
+        protected async Task<TeslaCommandResponseDTO<ResponseType>> PostCommand<ResponseType>(string command, object requestBody)
         {
             string url = TeslaAPI.COMMAND_PATH
                         .Replace("{id}", Id)
@@ -60,26 +63,31 @@ namespace Greenergy.Tesla
                 throw new Exception($"Command {command} failed. StatusCode={response.StatusCode}, Reason={response.ReasonPhrase}");
             }
 
-            var responseDTO = JsonConvert.DeserializeObject<ResponseDTOType>(
-                await response.Content.ReadAsStringAsync()
+            var responseStr = await response.Content.ReadAsStringAsync();
+
+            var responseDTO = JsonConvert.DeserializeObject<TeslaCommandResponseDTO<ResponseType>>(
+                responseStr
             );
 
             return responseDTO;
         }
-
         public async Task<bool> StartCharge()
         {
-            var response = await PostCommand<TeslaCommandResponseDTO>("start_charge", null);
-            return response.response;
+            var response = await PostCommand<TeslaCommandResponseType>("charge_start", null);
+            return response.response.result;
         }
-
+        public async Task<bool> StopCharge()
+        {
+            var response = await PostCommand<TeslaCommandResponseType>("charge_stop", null);
+            return response.response.result;
+        }
         public async Task<bool> SetChargeLimit(int percent)
         {
-            var response = await PostCommand<TeslaCommandResponseDTO>(
+            var response = await PostCommand<TeslaCommandResponseType>(
                 "set_charge_limit", 
                 new { percent = percent }
             );
-            return response.response;
+            return response.response.result;
         }
     }
 }
