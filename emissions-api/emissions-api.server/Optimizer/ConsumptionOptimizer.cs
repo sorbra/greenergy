@@ -87,16 +87,19 @@ namespace Greenergy.Emissions.Optimization
             return regionalConsumptionInfo;
         }
 
-        public List<List<OptimalConsumptionPrognosis>> SuggestConsumption(List<EmissionDataDTO> prognoses)
+        public List<RegionalConsumptionPrognoses> SuggestConsumption(List<EmissionDataDTO> prognoses)
         {
             // Split into regions
             var prognosisRegions = prognoses.GroupBy(p => p.Region);
 
-            var regionalInfos = new List<List<OptimalConsumptionPrognosis>>();
+            var regionalInfos = new List<RegionalConsumptionPrognoses>();
             foreach (var r in prognosisRegions)
             {
                 var rPrognoses = r.OrderBy(p => p.EmissionTimeUTC).ToList();
-                regionalInfos.Add(ExtractRegionalConsumptionInfo(rPrognoses, r.Key));
+                regionalInfos.Add( new RegionalConsumptionPrognoses() {
+                                            Region = r.Key,
+                                            Prognoses = ExtractRegionalConsumptionInfo(rPrognoses, r.Key)
+                });
             }
 
             return regionalInfos;
