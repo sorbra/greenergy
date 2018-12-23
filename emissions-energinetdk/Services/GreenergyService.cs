@@ -119,6 +119,7 @@ namespace Greenergy.Services
         {
             _logger.LogDebug("Stopping");
             _emissionsSyncTimer.Change(Timeout.Infinite, 0);
+            _prognosisSyncTimer.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
 
@@ -146,6 +147,7 @@ namespace Greenergy.Services
         public void Dispose()
         {
             _emissionsSyncTimer?.Dispose();
+            _prognosisSyncTimer?.Dispose();
         }
     }
 }

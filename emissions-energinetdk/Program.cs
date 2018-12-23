@@ -18,7 +18,7 @@ namespace Greenergy
 {
     class Program
     {
-        private const string _prefix = "GREENERGY_";
+        private const string _prefix = "ENERGINETDK_";
         private const string _appsettings = "appsettings.json";
         private const string _hostsettings = "hostsettings.json";
 

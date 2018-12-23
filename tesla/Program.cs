@@ -1,39 +1,58 @@
 ﻿using System;
-using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.FileExtensions;
+using Microsoft.Extensions.Configuration.CommandLine;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Greenergy.Tesla
+namespace Greenergy.TeslaCharger
 {
     class Program
     {
-        static async Task DoStuff(string email, string password)
+        private const string _prefix = "TESLACHARGER_";
+        private const string _appsettings = "appsettings.json";
+        private const string _hostsettings = "hostsettings.json";
+
+        public static async Task Main(string[] args)
         {
-            TeslaOwner owner = new TeslaOwner(email);
-            await owner.AuthenticateAsync(password);
-            var vehicles = await owner.GetVehiclesAsync();
-            
-            var myTesla = vehicles.FirstOrDefault();
-            
-            var chargeState = await myTesla.GetChargeStateAsync();
+            var host = new HostBuilder()
+                .ConfigureHostConfiguration(configHost =>
+                {
+                    configHost.SetBasePath(Directory.GetCurrentDirectory());
+                    configHost.AddJsonFile(_hostsettings, optional: true);
+                    configHost.AddEnvironmentVariables(prefix: _prefix);
+                    configHost.AddCommandLine(args);
+                })
+                .ConfigureAppConfiguration((hostContext, configApp) =>
+                {
+                    configApp.SetBasePath(Directory.GetCurrentDirectory());
+                    configApp.AddJsonFile(_appsettings, optional: true);
+                    configApp.AddJsonFile(
+                        $"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json",
+                        optional: true);
+                    configApp.AddEnvironmentVariables(prefix: _prefix);
+                    configApp.AddCommandLine(args);
+                })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddLogging();
+                    services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
 
-//            bool limitset = await myTesla.SetChargeLimit(90);
+                    services.AddHostedService<TeslaChargerService>();
+                })
+                .ConfigureLogging((hostContext, loggingBuilder) =>
+                {
+                    loggingBuilder.AddConsole();
+                })
+                .UseConsoleLifetime()
+                .Build();
 
-            bool charging = await myTesla.StartCharge();
-//            bool charging = await myTesla.StopCharge();
-            
-
-            // var response = await hclient.GetAsync(client.BaseUri+$"/api/1/vehicles/{vehicle.Id}/data_request/charge_state");
-            // var cstate = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
-
-
-            // .Data.Response.FirstOrDefault();
-            // IChargeState chargeState = (await client.GetChargeStateAsync(vehicle.Id,token.AccessToken)).Data.Response;
-        }
-
-
-        static void Main(string[] args)
-        {
-            DoStuff(args[0],args[1]).Wait();
+            await host.RunAsync();
         }
     }
 }
