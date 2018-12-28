@@ -46,7 +46,7 @@ namespace Greenergy
                 {
                     services.AddLogging();
                     var ctx = hostContext.Configuration.GetSection("application");
-                    services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("application"));
+                    services.Configure<ApplicationSettings>(hostContext.Configuration.GetSection("Application"));
 
                     services.AddTransient<IEnerginetAPI, EnerginetAPI>();
 
@@ -55,6 +55,7 @@ namespace Greenergy
                 .ConfigureLogging((hostContext, loggingBuilder) =>
                 {
                     loggingBuilder.AddConsole();
+                    loggingBuilder.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
                 })
                 .UseConsoleLifetime()
                 .Build();
