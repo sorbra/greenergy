@@ -21,6 +21,20 @@ namespace Greenergy.TeslaCharger.Registry
             _context = context;
             _logger = logger;
         }
+        public async Task<List<TeslaVehicleMongo>> AllVehicles()
+        {
+            try
+            {
+                var query = _context.TeslaVehicleCollection.Find(_ => true);
+                var vehicles = await query.ToListAsync();
+                return vehicles;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex,ex.Message);
+                throw ex;
+            }
+        }
         public async Task UpdateTeslaVehicle(TeslaVehicleMongo vehicle)
         {
             var filter = Builders<TeslaVehicleMongo>.Filter.Eq(v => v.Id, vehicle.Id);

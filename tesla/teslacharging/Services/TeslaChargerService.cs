@@ -17,7 +17,7 @@ namespace Greenergy.TeslaCharger.Service
     {
         private readonly IOptions<ApplicationSettings> _config;
         private readonly ILogger _logger;
-        private readonly ITeslaDataContext _teslactx;
+        private readonly ITeslaVehiclesRepository _vehicles;
         private readonly IApplicationLifetime _applicationLifetime;
 
         private Timer _chargingCheckTimer;
@@ -25,13 +25,13 @@ namespace Greenergy.TeslaCharger.Service
             IOptions<ApplicationSettings> config,
             IApplicationLifetime applicationLifetime,
             ILogger<TeslaChargerService> logger,
-            ITeslaDataContext teslactx
+            ITeslaVehiclesRepository vehicles
             )
         {
             _config = config;
             _applicationLifetime = applicationLifetime;
             _logger = logger;
-            _teslactx = teslactx;
+            _vehicles = vehicles;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -53,11 +53,12 @@ namespace Greenergy.TeslaCharger.Service
         {
             try
             {
-                var owners = _teslactx.TeslaVehicleCollection;
-                var filter = Builders<TeslaVehicleMongo>.Filter.Empty;
-
                 _logger.LogInformation("CheckCharging called...");
-//                await (await owners.FindAsync(filter)).ForEachAsync( to => _logger.LogInformation(to.Email));
+                var vehicles = await _vehicles.AllVehicles();
+                foreach (var vehicle in vehicles)
+                {
+                    _logger.LogInformation($"{vehicle.VIN} : {vehicle.DisplayName}");
+                }
             }
             catch (System.Exception ex)
             {

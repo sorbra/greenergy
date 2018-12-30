@@ -7,7 +7,7 @@ namespace Greenergy.TeslaCharger.Registry
 {
     public interface ITeslaVehiclesRepository
     {
-//        Task<List<TeslaVehicleMongo>> GetTeslaVehicles();
         Task UpdateTeslaVehicle(TeslaVehicleMongo owner);
+        Task<List<TeslaVehicleMongo>> AllVehicles();
     }
 }
