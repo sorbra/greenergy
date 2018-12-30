@@ -1,0 +1,30 @@
+{
+    "ownerEmail": "sorbra@gmail.com",
+    "accessToken": "valid access token here",
+    "vin": "5YJSA3H12EFP35513",
+    "chargingConstraints": [
+      {
+        "WeekDays": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "byHour": 6,
+        "noEarlierThanHour": 0,
+        "minCharge": 50,
+        "maxCharge": 90
+      },
+      {
+        "WeekDays": [
+          "Saturday",
+          "Sunday"
+        ],
+        "byHour": 6,
+        "noEarlierThanHour": 0,
+        "minCharge": 90,
+        "maxCharge": 90
+      }
+    ]
+  }
