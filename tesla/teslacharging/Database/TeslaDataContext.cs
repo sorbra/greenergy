@@ -17,11 +17,11 @@ namespace Greenergy.TeslaCharger.Registry
                 _database = client.GetDatabase(settings.Value.Database);
             }
         }
-        public IMongoCollection<TeslaOwnerMongo> TeslaOwnerCollection
+        public IMongoCollection<TeslaVehicleMongo> TeslaVehicleCollection
         {
             get
             {
-                return _database.GetCollection<TeslaOwnerMongo>("TeslaOwners");
+                return _database.GetCollection<TeslaVehicleMongo>("TeslaVehicles");
             }
         }
     }

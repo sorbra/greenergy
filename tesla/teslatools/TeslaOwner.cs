@@ -25,18 +25,6 @@ namespace Greenergy.TeslaTools
             AccessToken = accessToken;
             Client.DefaultRequestHeaders.Add("Authorization", "Bearer " + AccessToken);
         }
-        // public TeslaOwner(TeslaOwnerMongo tom)
-        // {
-        //     this.Email = tom.Email;
-        //     this.AccessToken = tom.AccessToken;
-        //     Client = TeslaAPI.GetClient();
-        // }
-        // public TeslaOwner(TeslaOwnerDTO tod)
-        // {
-        //     this.Email = tod.Email;
-        //     this.AccessToken = tod.AccessToken;
-        //     Client = TeslaAPI.GetClient();
-        // }
         public async Task<string> AuthenticateAsync(string password)
         {
             var request = JsonConvert.SerializeObject(new

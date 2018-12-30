@@ -47,7 +47,7 @@ namespace Greenergy.TeslaCharger.Registry
             services.Configure<ApplicationSettings>(_config.GetSection("Application"));
             services.Configure<MongoSettings>(_config.GetSection("Mongo"));
 
-            services.AddTransient<ITeslaOwnersRepository, TeslaOwnersRepository>();
+            services.AddTransient<ITeslaVehiclesRepository, TeslaVehiclesRepository>();
             services.AddTransient<ITeslaDataContext, TeslaDataContext>();
             services.AddHostedService<TeslaChargerService>();
 

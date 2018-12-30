@@ -5,6 +5,6 @@ namespace Greenergy.TeslaCharger.Registry
 {
     public interface ITeslaDataContext
     {
-        IMongoCollection<TeslaOwnerMongo> TeslaOwnerCollection { get; }
+        IMongoCollection<TeslaVehicleMongo> TeslaVehicleCollection { get; }
     }
 }

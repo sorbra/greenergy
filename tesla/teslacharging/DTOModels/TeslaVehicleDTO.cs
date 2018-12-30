@@ -6,32 +6,15 @@ using System.Collections.Generic;
 
 namespace Greenergy.TeslaCharger.DTOModels
 {
-    public class TeslaOwnerDTO
-    {
-        public TeslaOwnerDTO(string Email)
-        {
-            this.Email = Email;
-        }
-        public TeslaOwnerDTO()
-        {
-        }
-        [Required]
-        public string Email { get; set; }
-        [Required]
-        public string AccessToken { get; set; }
-        [Required]
-        public List<TeslaVehicleDTO> Vehicles;
-    }
-
     public class TeslaVehicleDTO
     {
+        [Required]
+        public string OwnerEmail { get; set; }
+        public string AccessToken { get; set; }
+        [Required]
         public string VIN { get; set; }
         public string DisplayName { get; set; }
+        [Required]
         public List<ChargingConstraintDTO> ChargingConstraints { get; set; }
-    }
-
-    public class ChargingConstraintDTO
-    {
-
     }
 }

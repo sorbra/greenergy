@@ -53,11 +53,11 @@ namespace Greenergy.TeslaCharger.Service
         {
             try
             {
-                var owners = _teslactx.TeslaOwnerCollection;
-                var filter = Builders<TeslaOwnerMongo>.Filter.Empty;
+                var owners = _teslactx.TeslaVehicleCollection;
+                var filter = Builders<TeslaVehicleMongo>.Filter.Empty;
 
                 _logger.LogInformation("CheckCharging called...");
-                await (await owners.FindAsync(filter)).ForEachAsync( to => _logger.LogInformation(to.Email));
+//                await (await owners.FindAsync(filter)).ForEachAsync( to => _logger.LogInformation(to.Email));
             }
             catch (System.Exception ex)
             {

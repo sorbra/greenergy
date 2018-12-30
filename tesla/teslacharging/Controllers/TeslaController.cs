@@ -13,38 +13,59 @@ namespace Greenergy.TeslaCharger.Registry.API
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeslaController : ControllerBase
+    public class TeslaVehicleController : ControllerBase
     {
-        private ILogger<TeslaController> _logger;
-        private ITeslaOwnersRepository _teslaRepository;
+        private ILogger<TeslaVehicleController> _logger;
+        private ITeslaVehiclesRepository _teslaRepository;
 
-        public TeslaController(ILogger<TeslaController> logger, ITeslaOwnersRepository teslaRepository)
+        public TeslaVehicleController(ILogger<TeslaVehicleController> logger, ITeslaVehiclesRepository teslaRepository)
         {
             _logger = logger;
             _teslaRepository = teslaRepository;
         }
-
+        // [HttpGet]
+        // public async Task<ActionResult<ChargingConstraintDTO>> GetConstraint()
+        // {
+        //     _logger.LogInformation("dyt");
+        //     var c = new ChargingConstraintDTO() {
+                
+        //     }
+        //     return StatusCode(StatusCodes.Status405MethodNotAllowed);
+        // }
         [HttpPost]
-        public async Task<ActionResult> UpdateTeslaOwner([FromBody] TeslaOwnerDTO ownerDTO)
+        public async Task<ActionResult> RegisterVehicle([FromBody] TeslaVehicleDTO vehicleReceived)
         {
             try
             {
-                //var owner = new TeslaOwner(ownerDTO);
-                var owner = new TeslaOwner(ownerDTO.Email,ownerDTO.AccessToken);
+                var owner = new TeslaOwner(vehicleReceived.OwnerEmail, vehicleReceived.AccessToken);
                 var vehicles = await owner.GetVehiclesAsync();
+
+                var vehicleFound = vehicles.Where( v => v.VIN == vehicleReceived.VIN ).FirstOrDefault();
+                if (vehicleFound == null)
+                {
+                    var msg = $"User {vehicleReceived.OwnerEmail} does not own vehicle {vehicleReceived.VIN}";
+                    _logger.LogWarning(msg);
+                    return StatusCode(StatusCodes.Status403Forbidden,msg);
+                }
                 
-                await _teslaRepository.UpdateTeslaOwner(
-                    new TeslaOwnerMongo() {
-                        Email = ownerDTO.Email,
-                        AccessToken = ownerDTO.AccessToken,
-                        vehicles = vehicles.ConvertAll<TeslaVehicleMongo>( tv => new TeslaVehicleMongo {
-                            Id = tv.Id,
-                            VIN = tv.VIN,
-                            DisplayName = tv.DisplayName
+                await _teslaRepository.UpdateTeslaVehicle(
+                    new TeslaVehicleMongo() {
+                        OwnerEmail = vehicleReceived.OwnerEmail,
+                        AccessToken = vehicleReceived.AccessToken,
+                        Id = vehicleFound.Id,
+                        VIN = vehicleFound.VIN,
+                        DisplayName = vehicleFound.DisplayName,
+                        ChargingConstraints = vehicleReceived.ChargingConstraints.ConvertAll( cc => new ChargingConstraintMongo() {
+                            WeekDays = Array.ConvertAll(cc.WeekDays, ds => Enum.Parse<DayOfWeek>(ds)),
+                            Date = cc.Date,
+                            ByHour = cc.ByHour,
+                            NoEarlierThanHour = cc.NoEarlierThanHour,
+                            MinCharge = cc.MinCharge,
+                            MaxCharge = cc.MaxCharge
                         })
                     }
                 );
-                _logger.LogInformation($"Updated {ownerDTO.Email}");
+                _logger.LogInformation($"Registered vehicle {vehicleFound.VIN}");
             }
             catch (System.Exception ex)
             {
@@ -52,31 +73,6 @@ namespace Greenergy.TeslaCharger.Registry.API
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
             return Ok();
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<List<TeslaOwnerDTO>>> GetTeslaOwners()
-        {
-            try
-            {
-                var owners = await _teslaRepository.GetTeslaOwners();
-                if (owners != null)
-                {
-                    return owners.ConvertAll(o => new TeslaOwnerDTO()
-                    {
-                        Email = o.Email
-                    });
-                }
-                else
-                {
-                    return new List<TeslaOwnerDTO>();
-                }
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
         }
     }
 }
