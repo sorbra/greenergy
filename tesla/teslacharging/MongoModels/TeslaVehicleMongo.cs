@@ -32,5 +32,18 @@ namespace Greenergy.TeslaCharger.MongoModels
         // If multiple specific constraints are set with the same date, only one of those constraints will apply
         [Required]
         public List<ChargingConstraintMongo> ChargingConstraints;
+
+        public void Validate()
+        {
+            var constraintCount = ChargingConstraints?.Count;
+            if (constraintCount.Equals(0))
+            {
+                throw new Exception("At least one charging constraint required.");
+            }
+            foreach (var c in ChargingConstraints)
+            {
+                c.Validate();
+            }
+        }
     }
 }

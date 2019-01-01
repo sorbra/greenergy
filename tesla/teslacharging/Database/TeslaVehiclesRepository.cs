@@ -37,6 +37,8 @@ namespace Greenergy.TeslaCharger.Registry
         }
         public async Task UpdateTeslaVehicle(TeslaVehicleMongo vehicle)
         {
+
+
             var filter = Builders<TeslaVehicleMongo>.Filter.Eq(v => v.Id, vehicle.Id);
             var update = Builders<TeslaVehicleMongo>.Update
                             .Set(v => v.OwnerEmail, vehicle.OwnerEmail)

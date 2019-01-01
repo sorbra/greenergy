@@ -10,6 +10,7 @@ using Greenergy.TeslaCharger.Settings;
 using MongoDB.Driver.Linq;
 using Greenergy.TeslaCharger.MongoModels;
 using MongoDB.Driver;
+using Greenergy.TeslaCharger.Constraints;
 
 namespace Greenergy.TeslaCharger.Service
 {
@@ -33,7 +34,6 @@ namespace Greenergy.TeslaCharger.Service
             _logger = logger;
             _vehicles = vehicles;
         }
-
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _applicationLifetime.ApplicationStarted.Register(OnStarted);
@@ -57,7 +57,8 @@ namespace Greenergy.TeslaCharger.Service
                 var vehicles = await _vehicles.AllVehicles();
                 foreach (var vehicle in vehicles)
                 {
-                    _logger.LogInformation($"{vehicle.VIN} : {vehicle.DisplayName}");
+                    var chargeTimeRange = ChargeTimeRange.NextChargeBy(vehicle.ChargingConstraints);
+                    _logger.LogInformation($"{vehicle.VIN} : {vehicle.DisplayName} : Charge between {chargeTimeRange.ChargeNoEarlierThan} and {chargeTimeRange.ChargeBy}");
                 }
             }
             catch (System.Exception ex)

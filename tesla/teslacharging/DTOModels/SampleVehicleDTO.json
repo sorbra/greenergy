@@ -13,6 +13,7 @@
         ],
         "byHour": 6,
         "noEarlierThanHour": 0,
+        "timeZone": "Europe/Copenhagen",
         "minCharge": 50,
         "maxCharge": 90
       },
@@ -23,6 +24,7 @@
         ],
         "byHour": 6,
         "noEarlierThanHour": 0,
+        "timeZone": "Europe/Copenhagen",
         "minCharge": 90,
         "maxCharge": 90
       }

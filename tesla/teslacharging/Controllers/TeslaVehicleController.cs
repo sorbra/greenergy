@@ -28,7 +28,7 @@ namespace Greenergy.TeslaCharger.Registry.API
         // {
         //     _logger.LogInformation("dyt");
         //     var c = new ChargingConstraintDTO() {
-                
+
         //     }
         //     return StatusCode(StatusCodes.Status405MethodNotAllowed);
         // }
@@ -40,29 +40,34 @@ namespace Greenergy.TeslaCharger.Registry.API
                 var owner = new TeslaOwner(vehicleReceived.OwnerEmail, vehicleReceived.AccessToken);
                 var vehicles = await owner.GetVehiclesAsync();
 
-                var vehicleFound = vehicles.Where( v => v.VIN == vehicleReceived.VIN ).FirstOrDefault();
+                var vehicleFound = vehicles.Where(v => v.VIN == vehicleReceived.VIN).FirstOrDefault();
                 if (vehicleFound == null)
                 {
                     var msg = $"User {vehicleReceived.OwnerEmail} does not own vehicle {vehicleReceived.VIN}";
                     _logger.LogWarning(msg);
-                    return StatusCode(StatusCodes.Status403Forbidden,msg);
+                    return StatusCode(StatusCodes.Status403Forbidden, msg);
                 }
-                
+
                 await _teslaRepository.UpdateTeslaVehicle(
-                    new TeslaVehicleMongo() {
+                    new TeslaVehicleMongo()
+                    {
                         OwnerEmail = vehicleReceived.OwnerEmail,
                         AccessToken = vehicleReceived.AccessToken,
                         Id = vehicleFound.Id,
                         VIN = vehicleFound.VIN,
                         DisplayName = vehicleFound.DisplayName,
-                        ChargingConstraints = vehicleReceived.ChargingConstraints.ConvertAll( cc => new ChargingConstraintMongo() {
-                            WeekDays = Array.ConvertAll(cc.WeekDays, ds => Enum.Parse<DayOfWeek>(ds)),
-                            Date = cc.Date,
-                            ByHour = cc.ByHour,
-                            NoEarlierThanHour = cc.NoEarlierThanHour,
-                            MinCharge = cc.MinCharge,
-                            MaxCharge = cc.MaxCharge
-                        })
+                        ChargingConstraints = vehicleReceived.ChargingConstraints.ConvertAll(cc =>
+                            new ChargingConstraintMongo()
+                            {
+                                WeekDays = Array.ConvertAll(cc.WeekDays, ds => Enum.Parse<DayOfWeek>(ds)),
+                                Date = cc.Date,
+                                ByHour = cc.ByHour,
+                                NoEarlierThanHour = cc.NoEarlierThanHour,
+                                TimeZone = cc.TimeZone,
+                                MinCharge = cc.MinCharge,
+                                MaxCharge = cc.MaxCharge
+                            }
+                        )
                     }
                 );
                 _logger.LogInformation($"Registered vehicle {vehicleFound.VIN}");
