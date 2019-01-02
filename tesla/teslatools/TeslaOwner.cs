@@ -80,9 +80,9 @@ namespace Greenergy.TeslaTools
                     Owner = this,
                     Id = v.Id,
                     VIN = v.VIN,
-                    DisplayName = v.DisplayName,
-                    InService = v.InService,
-                    State = v.State
+                    DisplayName = v.DisplayName //,
+//                    InService = v.InService,
+//                    State = v.State
                 })
                 .ToList();
 

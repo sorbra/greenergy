@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
+using Greenergy.TeslaTools;
 
 namespace Greenergy.TeslaCharger.MongoModels
 {
@@ -32,6 +33,17 @@ namespace Greenergy.TeslaCharger.MongoModels
         // If multiple specific constraints are set with the same date, only one of those constraints will apply
         [Required]
         public List<ChargingConstraintMongo> ChargingConstraints;
+
+        public static explicit operator TeslaVehicle(TeslaVehicleMongo tm)
+        {
+            return new TeslaVehicle
+            {
+                Owner = new TeslaOwner(tm.OwnerEmail, tm.AccessToken),
+                Id = tm.Id,
+                VIN = tm.VIN,
+                DisplayName = tm.DisplayName
+            };
+        }
 
         public void Validate()
         {

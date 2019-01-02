@@ -14,8 +14,8 @@ namespace Greenergy.TeslaTools
         public string Id { get; set; }
         public string VIN { get; set; }
         public string DisplayName { get; set; }
-        public bool InService;
-        public string State;
+        // public bool InService;
+        // public string State;
 
         public async Task<TeslaChargeState> GetChargeStateAsync()
         {
