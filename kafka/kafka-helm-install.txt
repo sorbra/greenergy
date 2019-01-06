@@ -57,7 +57,7 @@ To create a new topic:
 
 To listen for messages on a topic:
 
-  kubectl -n default exec -ti testclient -- /usr/bin/kafka-console-consumer --bootstrap-server green-kafka:9092 --topic test1 --from-beginning
+  
 
 To stop the listener session above press: Ctrl+C
 

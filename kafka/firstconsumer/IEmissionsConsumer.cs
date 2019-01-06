@@ -1,9 +1,10 @@
 using System;
+using System.Threading;
 
 namespace Greenergy.Messaging
 {
     public interface IEmissionsConsumer
     {
-        void Listen(Action<string> message);
+        void Consume(CancellationToken cts);
     }
 }

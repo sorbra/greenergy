@@ -1,0 +1,21 @@
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: consumptionconsumer-deployment
+  labels:
+    app: consumptionconsumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumptionconsumer
+  template:
+    metadata:
+      labels:
+        app: consumptionconsumer
+    spec:
+      containers:
+      - name:  consumptionconsumer
+        image: sorbra/consumptionconsumer:0.1
+        imagePullPolicy: Always

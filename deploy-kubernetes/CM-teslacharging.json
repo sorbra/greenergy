@@ -1,0 +1,13 @@
+{
+  "MongoSettings": {
+    "ConnectionString": "mongodb://root:!dev123@green-mongo-dev-mongodb:27017",
+    "Database": "GreenergyDB"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Warning",
+      "Microsoft": "Warning"
+    }
+  }
+}

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using Greenergy.Messaging;
 
 namespace firstclient
 {
@@ -6,7 +8,13 @@ namespace firstclient
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CancellationTokenSource cts = new CancellationTokenSource();
+            Console.CancelKeyPress += (_, e) =>
+            {
+                e.Cancel = true; // prevent the process from terminating.
+                cts.Cancel();
+            };
+            new EmissionsConsumer().Consume(cts.Token);
         }
     }
 }

@@ -12,6 +12,7 @@ using Greenergy.TeslaCharger.MongoModels;
 using MongoDB.Driver;
 using Greenergy.TeslaCharger.Constraints;
 using Greenergy.TeslaTools;
+using Confluent.Kafka;
 
 namespace Greenergy.TeslaCharger.Service
 {
@@ -22,7 +23,9 @@ namespace Greenergy.TeslaCharger.Service
         private readonly ITeslaVehiclesRepository _vehicles;
         private readonly IApplicationLifetime _applicationLifetime;
 
-        private Timer _chargingCheckTimer;
+        //        private Timer _chargingCheckTimer;
+        private CancellationTokenSource _cts;
+
         public TeslaChargerService(
             IOptions<ApplicationSettings> config,
             IApplicationLifetime applicationLifetime,
@@ -41,18 +44,55 @@ namespace Greenergy.TeslaCharger.Service
             _applicationLifetime.ApplicationStopping.Register(OnStopping);
             _applicationLifetime.ApplicationStopped.Register(OnStopped);
 
+            _cts = new CancellationTokenSource();
+
             _logger.LogDebug("Service started: " + _config.Value.Name);
 
-            _chargingCheckTimer = new Timer(CheckCharging, null, TimeSpan.Zero, TimeSpan.FromSeconds(_config.Value.ChargingCheckRateInMinutes * 60));
+            //            _chargingCheckTimer = new Timer(CheckCharging, null, TimeSpan.Zero, TimeSpan.FromSeconds(_config.Value.ChargingCheckRateInMinutes * 60));
 
-            _logger.LogDebug($"Charging status will be checked every {_config.Value.ChargingCheckRateInMinutes} minutes");
+            Task.Run(() => KafkaConsume());
 
             return Task.CompletedTask;
         }
 
-        private async void CheckCharging(object state)
+        private async Task KafkaConsume()
         {
-            _logger.LogDebug("CheckCharging called");
+            _logger.LogDebug($"KafkaConsume is running");
+
+            var config = new ConsumerConfig
+            {
+                GroupId = "teslacharger",
+                BootstrapServers = "green-kafka:9092",
+                // Note: The AutoOffsetReset property determines the start offset in the event
+                // there are not yet any committed offsets for the consumer group for the
+                // topic/partitions of interest. By default, offsets are committed
+                // automatically, so in this example, consumption will only start from the
+                // earliest message in the topic 'my-topic' the first time you run the program.
+                AutoOffsetReset = AutoOffsetResetType.Earliest
+            };
+
+            using (var c = new Consumer<string, string>(config))
+            {
+                c.Subscribe("future-consumption");
+                // c.OnError += (_, msg) =>
+                // {
+                //     message(msg.Value);
+                // };
+
+                while (!_cts.IsCancellationRequested)
+                {
+                    var cr = c.Consume(_cts.Token);
+                    Console.WriteLine($"Consumed message from '{cr.Topic}', partion {cr.Partition}, offset {cr.Offset}, length {cr.Value.Length}, head {cr.Value.Substring(0, 30)}");
+                    await CheckCharging();
+                }
+
+            }
+
+            _logger.LogDebug($"KafkaConsume is terminating");
+        }
+        private async Task CheckCharging()
+        {
+            _logger.LogDebug("CheckCharging running");
             try
             {
                 var vehicles = await _vehicles.AllVehicles();
@@ -88,31 +128,25 @@ namespace Greenergy.TeslaCharger.Service
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            //            _logger.LogDebug("Stopping");
-            _chargingCheckTimer.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
         private void OnStarted()
         {
-            //            _logger.LogDebug("OnStarted has been called.");
-
             // Perform post-startup activities here
         }
         private void OnStopping()
         {
-            //            _logger.LogDebug("OnStopping has been called.");
-
+            _logger.LogDebug("OnStopping");
+            _cts.Cancel();
             // Perform on-stopping activities here
         }
         private void OnStopped()
         {
-            //            _logger.LogDebug("OnStopped has been called.");
-
             // Perform post-stopped activities here
         }
         public void Dispose()
         {
-            _chargingCheckTimer?.Dispose();
+            _cts.Dispose();
         }
     }
 }

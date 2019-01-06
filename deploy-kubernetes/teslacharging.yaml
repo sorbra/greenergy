@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: teslacharging-deployment
+  labels:
+    app: teslacharging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: teslacharging
+  template:
+    metadata:
+      labels:
+        app: teslacharging
+    spec:
+      containers:
+      - name:  teslacharging
+        image: sorbra/teslacharging:0.1.0
+        imagePullPolicy: Always
+        volumeMounts: 
+        - name: "appsettings"
+          mountPath: "/app/teslacharging.server/appsettings.json"
+          subPath: "appsettings.json"
+      volumes:
+      - name: "appsettings"
+        configMap: 
+          name: "teslacharging.appsettings"

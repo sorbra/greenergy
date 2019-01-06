@@ -1,34 +1,40 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using Confluent.Kafka;
-using Confluent.Kafka.Serialization;
 
 namespace Greenergy.Messaging
 {
-
-    public class BookingConsumer : IEmissionsConsumer
+    public class EmissionsConsumer : IEmissionsConsumer
     {
-        public void Listen(Action<string> message)
+        public void Consume(CancellationToken cts)
         {
-            var config = new Dictionary<string, object>
+            var config = new ConsumerConfig
             {
-                {"group.id","booking_consumer" },
-                {"bootstrap.servers", "localhost:9092" }
-                { "enable.auto.commit", "false" }
+                GroupId = "teslacharger",
+                BootstrapServers = "green-kafka:9092",
+                // Note: The AutoOffsetReset property determines the start offset in the event
+                // there are not yet any committed offsets for the consumer group for the
+                // topic/partitions of interest. By default, offsets are committed
+                // automatically, so in this example, consumption will only start from the
+                // earliest message in the topic 'my-topic' the first time you run the program.
+                AutoOffsetReset = AutoOffsetResetType.Earliest
             };
 
-            using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
+            using (var c = new Consumer<string, string>(config))
             {
-                consumer.Subscribe("timemanagement_booking");
-                consumer.OnMessage += (_, msg) =>
-                {
-                    message(msg.Value);
-                };
+                c.Subscribe("future-consumption");
+                // c.OnError += (_, msg) =>
+                // {
+                //     message(msg.Value);
+                // };
 
-                while (true)
+                while (!cts.IsCancellationRequested)
                 {
-                    consumer.Poll(100);
+                    var cr = c.Consume(cts);
+                    Console.WriteLine($"Consumed message from '{cr.Topic}', partion {cr.Partition}, offset {cr.Offset}, length {cr.Value.Length}, head {cr.Value.Substring(0,30)}");
                 }
             }
         }
