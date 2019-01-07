@@ -4,12 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
 using Greenergy.TeslaCharger.Registry;
 using Greenergy.TeslaCharger.Settings;
-using MongoDB.Driver.Linq;
-using Greenergy.TeslaCharger.MongoModels;
-using MongoDB.Driver;
+//using Greenergy.TeslaCharger.MongoModels;
 using Greenergy.TeslaCharger.Constraints;
 using Greenergy.TeslaTools;
 using Confluent.Kafka;
@@ -68,31 +65,39 @@ namespace Greenergy.TeslaCharger.Service
                 // topic/partitions of interest. By default, offsets are committed
                 // automatically, so in this example, consumption will only start from the
                 // earliest message in the topic 'my-topic' the first time you run the program.
-                AutoOffsetReset = AutoOffsetResetType.Earliest
+                AutoOffsetReset = AutoOffsetResetType.Earliest,
+                EnableAutoCommit = true
             };
 
             using (var c = new Consumer<string, string>(config))
             {
                 c.Subscribe("future-consumption");
-                // c.OnError += (_, msg) =>
-                // {
-                //     message(msg.Value);
-                // };
 
-                while (!_cts.IsCancellationRequested)
+                c.OnError += (_, e)
+                    => Console.WriteLine($"Error: {e.Reason}");
+                
+                var ct = _cts.Token;
+
+                while (!ct.IsCancellationRequested)
                 {
-                    var cr = c.Consume(_cts.Token);
-                    Console.WriteLine($"Consumed message from '{cr.Topic}', partion {cr.Partition}, offset {cr.Offset}, length {cr.Value.Length}, head {cr.Value.Substring(0, 30)}");
-                    await CheckCharging();
+                    try
+                    {
+                        var cr = c.Consume(ct);
+                        Console.WriteLine($"Consumed message from '{cr.Topic}', partion {cr.Partition}, offset {cr.Offset}, length {cr.Value.Length}, head {cr.Value.Substring(0, 30)}");
+                        await CheckCharging();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e,e.Message);
+                    }
                 }
-
             }
 
             _logger.LogDebug($"KafkaConsume is terminating");
         }
         private async Task CheckCharging()
         {
-            _logger.LogDebug("CheckCharging running");
+            _logger.LogDebug("CheckCharging called");
             try
             {
                 var vehicles = await _vehicles.AllVehicles();
@@ -137,6 +142,7 @@ namespace Greenergy.TeslaCharger.Service
         private void OnStopping()
         {
             _logger.LogDebug("OnStopping");
+
             _cts.Cancel();
             // Perform on-stopping activities here
         }

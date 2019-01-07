@@ -33,8 +33,15 @@ namespace Greenergy.Messaging
 
                 while (!cts.IsCancellationRequested)
                 {
-                    var cr = c.Consume(cts);
-                    Console.WriteLine($"Consumed message from '{cr.Topic}', partion {cr.Partition}, offset {cr.Offset}, length {cr.Value.Length}, head {cr.Value.Substring(0,30)}");
+                    try
+                    {
+                        var cr = c.Consume(cts);
+                        Console.WriteLine($"Consumed message from '{cr.Topic}', partion {cr.Partition}, offset {cr.Offset}, length {cr.Value.Length}, head {cr.Value.Substring(0, 30)}");
+                    }
+                    catch (Exception e)
+                    {
+                        System.Console.WriteLine(e.Message);
+                    }
                 }
             }
         }
