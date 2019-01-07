@@ -8,6 +8,6 @@ namespace Greenergy.TeslaCharger.Settings
     {
         public string Name { get; set; }
 
-        public int ChargingCheckRateInMinutes { get; set; }
+//        public int ChargingCheckRateInMinutes { get; set; }
     }
 }

@@ -23,15 +23,6 @@ namespace Greenergy.TeslaCharger.Registry.API
             _logger = logger;
             _teslaRepository = teslaRepository;
         }
-        // [HttpGet]
-        // public async Task<ActionResult<ChargingConstraintDTO>> GetConstraint()
-        // {
-        //     _logger.LogInformation("dyt");
-        //     var c = new ChargingConstraintDTO() {
-
-        //     }
-        //     return StatusCode(StatusCodes.Status405MethodNotAllowed);
-        // }
         [HttpPost]
         public async Task<ActionResult> RegisterVehicle([FromBody] TeslaVehicleDTO vehicleReceived)
         {
@@ -72,7 +63,7 @@ namespace Greenergy.TeslaCharger.Registry.API
                 );
                 _logger.LogInformation($"Registered vehicle {vehicleFound.VIN}");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);

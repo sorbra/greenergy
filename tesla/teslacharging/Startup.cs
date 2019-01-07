@@ -35,15 +35,6 @@ namespace Greenergy.TeslaCharger.Registry
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.Configure<MongoSettings>(ms =>
-            // {
-            //     ms.ConnectionString
-            //         = _config.GetSection("Mongo:ConnectionString").Value;
-            //     ms.Database
-            //         = _config.GetSection("Mongo:Database").Value;
-
-            //     _logger.LogInformation(ms.Database);
-            // });
             services.Configure<ApplicationSettings>(_config.GetSection("Application"));
             services.Configure<MongoSettings>(_config.GetSection("Mongo"));
 
